@@ -34,8 +34,6 @@
   <ItemGroup>
     <Compile Include="CheckInput.cs" />
     <Compile Include="GameBoard.cs" />
-    <Compile Include="GameBoardTest.cs" />
-    <Compile Include="MemoryCardGame.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="UI.cs" />

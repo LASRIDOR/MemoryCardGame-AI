@@ -10,21 +10,21 @@ namespace B20_Ex02
 
     public class UI
     {
+        private static readonly int sr_PageWidth = 50;
         private readonly int r_MaxNumOfRow = 15;
         private readonly int r_MaxNumOfCol = 27;
         private readonly char r_SignOfPlaceForGameIcon = 'S';
-        private char[,] m_PresentationBoard;
+        private readonly char[,] m_PresentationBoard;
         private readonly List<char> r_RowSymbol;
         private readonly List<char> r_ColSymbol;
-        private readonly List<char> r_IconSymbol;
-
-        // make func to inc score and reset when game ends;
-        private static int s_ScoreForPlayerOne;
-        private static int s_ScoreForPlayerTwo;
-
+        private List<char> m_IconSymbol;
 
         public UI()
         {
+            m_PresentationBoard = new char[r_MaxNumOfRow,r_MaxNumOfCol];
+            r_RowSymbol = new List<char>(6);
+            r_ColSymbol = new List<char>(6);
+            makeRowColSymbol();
             makePresentationBoard();
         }
 
@@ -55,30 +55,28 @@ namespace B20_Ex02
         public void PlayMatchGame()
         {
             Player playerOne = playerOneLogin();
-            Player playerTwo = playerTwoLogin(playerOne.nameOfPlayer);
-            bool v_WantToPlay = true;
+            Player playerTwo = playerTwoLogin(playerOne.NameOfPlayer);
+            bool v_WantToPlayAnotherGame ;
 
-            while (v_WantToPlay == true)
+            do
             {
-                GameBoard board = makeGameBoard(playerOne.nameOfPlayer);
+                GameBoard board = makeGameBoard(playerOne.NameOfPlayer);
+
+                makeRandSymbolListOfIconAccordingToSizeOfBoard(board.NumOfRows, board.NumOfCols);
                 printBoard(board);
+                gameRoutineAndKeepScore(board, playerOne, playerTwo);
+                announceOnTheWinner(playerOne,playerTwo);
+                v_WantToPlayAnotherGame = askForAnotherGame(playerOne, playerTwo);
 
-                // create another func for playing routinefor this below while game has not finished and keep score
-                eTurn playerTurn = eTurn.PlayerOne;
-                playerMakeAMoveInTurn(board, playerOne, playerTwo, playerTurn);
-                switchTurn(ref playerTurn);
-
-
-
-                r_IconSymbol.Clear();
-            }
+                m_IconSymbol.Clear();
+            } while (v_WantToPlayAnotherGame == true) ;
         }
 
         private Player playerOneLogin()
         {
             string nameOfPlayerOne;
 
-            UI.printWelcomeSign("Welcome To Dor's World");
+            UI.printSign("Welcome To Dor's World");
             UI.printPlayerLogin();
             nameOfPlayerOne = System.Console.ReadLine();
 
@@ -123,56 +121,34 @@ namespace B20_Ex02
             string[] seperateSizeOfBoard;
             int rowOfBoard;
             int colOfBoard;
+            bool v_SizeIsValid;
 
-            printChoseSizeOfBoard(io_NameOfPlayerOne);
-            sizeOfBoard = System.Console.ReadLine();
-            seperateSizeOfBoard = sizeOfBoard.Split(seperator,2,StringSplitOptions.RemoveEmptyEntries);
+            do
+            {
+                printChoseSizeOfBoard(io_NameOfPlayerOne);
+                sizeOfBoard = System.Console.ReadLine();
+                v_SizeIsValid = CheckInput.BoardSize(sizeOfBoard);
+            } while (v_SizeIsValid == false);
+
+            seperateSizeOfBoard = sizeOfBoard.Split(seperator, 2, StringSplitOptions.RemoveEmptyEntries);
             rowOfBoard = int.Parse(seperateSizeOfBoard[0]);
             colOfBoard = int.Parse(seperateSizeOfBoard[1]);
 
             return new GameBoard(rowOfBoard,colOfBoard);
         }
-        private void makePresentationBoard()
+
+        private void gameRoutineAndKeepScore(GameBoard io_Board,Player io_PlayerOne,Player io_PlayerTwo)
         {
-            char startOfAlphabet = 'A';
-            char startOfNumbers = '1';
-
-
-            for (int i = 0; i < r_MaxNumOfRow; i++)
+            while (io_Board.gameHasFinished() == false)
             {
-                for (int j = 0; j < r_MaxNumOfCol; j++)
-                {
-                    if (i == 0 && j % 4 == 0 && j > 1)
-                    {
-                        m_PresentationBoard[i, j] = startOfAlphabet;
-                        startOfAlphabet++;
-                    }
-                    else if (i % 2 == 1 && i > 1 && j == 0)
-                    {
-                        m_PresentationBoard[i, j] = startOfNumbers;
-                        startOfNumbers++;
-                    }
-                    else if (i % 2 == 0 && j > 1 && i > 0)
-                    {
-                        m_PresentationBoard[i, j] = '=';
-                    }
-                    else if (i % 2 == 1 && i > 1 && j % 4 == 2)
-                    {
-                        m_PresentationBoard[i, j] = '|';
-                    }
-                    else if (i % 2 == 1 && j % 4 == 0 && i > 1 && j > 1)
-                    {
-                        m_PresentationBoard[i, j] = r_SignOfPlaceForGameIcon;
-                    }
-                    else
-                    {
-                        m_PresentationBoard[i, j] = ' ';
-                    }
-                }
+                eTurn playerTurn = eTurn.PlayerOne;
+
+                playerPlayHisTurn(io_Board, io_PlayerOne, io_PlayerTwo, playerTurn);
+                switchTurn(ref playerTurn);
             }
         }
 
-        private void playerMakeAMoveInTurn(GameBoard io_Board, Player io_PlayerOne, Player io_PlayerTwo, eTurn i_PlayerTurn)
+        private void playerPlayHisTurn(GameBoard io_Board, Player io_PlayerOne, Player io_PlayerTwo, eTurn i_PlayerTurn)
         {
             if (i_PlayerTurn == eTurn.PlayerOne)
             {
@@ -210,7 +186,7 @@ namespace B20_Ex02
             }
             else
             {
-                givePlayerAscore
+                io_Player.GivePlayerOnePoint();
             }
         }
 
@@ -288,9 +264,55 @@ namespace B20_Ex02
             {
                 o_PlayerCurrentTurn = eTurn.PlayerOne;
             }
+
         }
 
-        private static void printWelcomeSign(string i_Title)
+        private void announceOnTheWinner(Player io_PlayerOne, Player io_PlayerTwo)
+        {
+            string theWinner = "Both Of You";
+            string winnerAnnouncment = string.Format(@"The Winner Is {0}", theWinner);
+            string playerAnnouncmentInTable = string.Format(@"   {0} | {1}   ",io_PlayerOne.NameOfPlayer,io_PlayerTwo.NameOfPlayer);
+            string tableFormat = string.Format(@"-----------", io_PlayerOne.NameOfPlayer, io_PlayerTwo.NameOfPlayer);
+            string playerAnnouncment = string.Format(@"   {0} | {1}   ", io_PlayerOne.Score, io_PlayerTwo.Score);
+
+            printSign(playerAnnouncmentInTable + tableFormat + playerAnnouncment);
+
+            if (io_PlayerOne.Score > io_PlayerTwo.Score)
+            {
+                theWinner = io_PlayerOne.NameOfPlayer;
+            }
+            else if (io_PlayerOne.Score < io_PlayerTwo.Score)
+            {
+                theWinner = io_PlayerTwo.NameOfPlayer;
+            }
+
+
+            printSign(winnerAnnouncment);
+        }
+
+        private bool askForAnotherGame(Player io_PlayerOne, Player io_PlayerTwo)
+        {
+            string AnotherGameQuestion = string.Format(@"{0} And {1}
+Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
+            string playersAnswer;
+            bool v_PlayerOneAndTwoIsDesicion;
+            bool v_validAnswer;
+
+            Ex02.ConsoleUtils.Screen.Clear();
+            System.Console.WriteLine(AnotherGameQuestion);
+
+            do
+            {
+                playersAnswer = System.Console.ReadLine();
+                v_validAnswer = CheckInput.CheckValidAnswerForAnotherGameQuestion(playersAnswer);
+            } while (v_validAnswer == false);
+
+            v_PlayerOneAndTwoIsDesicion = (playersAnswer == "Yes" || playersAnswer == "yes");
+
+            return v_PlayerOneAndTwoIsDesicion;
+        }
+
+        private static void printSign(string i_Title)
         {
             System.String firstAndLastLineOfRectangle = new System.String('-', sr_PageWidth);
             System.String spacesWithPlaceToEdgesOfRectangle = new System.String(' ', sr_PageWidth - 2);
@@ -344,7 +366,7 @@ namespace B20_Ex02
                         indexCol = 0;
                     }
 
-                    printIconInCube(io_board.Board[indexRow,indexCol].SymbolOfIcon);
+                    printIconInCube(io_board.GetIconInCoordinate(indexRow,indexCol));
                     indexCol++;
                 }
                 else
@@ -356,12 +378,12 @@ namespace B20_Ex02
 
         private void printIconInCube(int i_SymbolOfIcon)
         {
-            System.Console.WriteLine(r_IconSymbol[i_SymbolOfIcon]);
+            System.Console.WriteLine(m_IconSymbol[i_SymbolOfIcon]);
         }
 
         private void printMakeAMove(Player io_Player, int i_NumOfRows, int i_NumOfCols)
         {
-            string msg = String.Format(@"{0} Make a Move:{1}", io_Player.nameOfPlayer,Environment.NewLine);
+            string msg = String.Format(@"{0} Make a Move:{1}", io_Player.NameOfPlayer,Environment.NewLine);
 
             System.Console.WriteLine();
         }
@@ -387,6 +409,77 @@ namespace B20_Ex02
             if (i_Move == "Q")
             {
                 Environment.Exit(1);
+            }
+        }
+
+        private void makeRowColSymbol()
+        {
+            char startOfAlphabet = 'A';
+            char startOfNumbers = '1';
+
+            for (int i = 0; i < 6; i++)
+            {
+                r_ColSymbol.Add(startOfAlphabet);
+                r_RowSymbol.Add(startOfNumbers);
+                startOfAlphabet++;
+                startOfNumbers++;
+            }
+        }
+
+        private void makeRandSymbolListOfIconAccordingToSizeOfBoard(int i_NumOfRows,int i_NumOfCols)
+        {
+            int numOfIconNeeded = i_NumOfCols * i_NumOfRows / 2;
+            Random random = new Random();
+
+            m_IconSymbol = new List<char>(numOfIconNeeded + 1);
+            m_IconSymbol.Add(' ');
+
+            for (int i = 0; i < numOfIconNeeded; i++)
+            {
+                // range in ascii table with only symbol (more the max board size)
+                int randomNumber = random.Next('!','~'+1);
+                char randIcon = (char)randomNumber;
+
+                m_IconSymbol.Add(randIcon);
+            }
+        }
+
+        private void makePresentationBoard()
+        {
+            List<char>.Enumerator rowListEnumerator = (List<char>.Enumerator)r_RowSymbol.GetEnumerator();
+            List<char>.Enumerator colListEnumerator = (List<char>.Enumerator)r_ColSymbol.GetEnumerator();
+
+            for (int i = 0; i < r_MaxNumOfRow; i++)
+            {
+                for (int j = 0; j < r_MaxNumOfCol; j++)
+                {
+                    if (i == 0 && j % 4 == 0 && j > 1)
+                    {
+                        m_PresentationBoard[i, j] = colListEnumerator.Current;
+                        colListEnumerator.MoveNext();
+                    }
+                    else if (i % 2 == 1 && i > 1 && j == 0)
+                    {
+                        m_PresentationBoard[i, j] = rowListEnumerator.Current;
+                        rowListEnumerator.MoveNext();
+                    }
+                    else if (i % 2 == 0 && j > 1 && i > 0)
+                    {
+                        m_PresentationBoard[i, j] = '=';
+                    }
+                    else if (i % 2 == 1 && i > 1 && j % 4 == 2)
+                    {
+                        m_PresentationBoard[i, j] = '|';
+                    }
+                    else if (i % 2 == 1 && j % 4 == 0 && i > 1 && j > 1)
+                    {
+                        m_PresentationBoard[i, j] = r_SignOfPlaceForGameIcon;
+                    }
+                    else
+                    {
+                        m_PresentationBoard[i, j] = ' ';
+                    }
+                }
             }
         }
         /*

@@ -4,28 +4,34 @@ using System.Text;
 
 namespace B20_Ex02
 {
-    class Player
+    public class Player
     {
-        private readonly string m_nameOfPlayer;
+        private readonly string m_NameOfPlayer;
+        private int m_Score;
         private Nullable<Ai> m_Ai;
 
         public Player(string i_NameOfPlayer,bool isAi)
         {
             if (isAi == true)
             {
-                m_nameOfPlayer = "RoboMatch";
+                m_NameOfPlayer = "RoboMatch";
                 m_Ai = new Ai();
             }
             else
             {
-                m_nameOfPlayer = i_NameOfPlayer;
+                m_NameOfPlayer = i_NameOfPlayer;
                 m_Ai = null;
             }
         }
 
-        public string nameOfPlayer
+        public string NameOfPlayer
         {
-            get { return m_nameOfPlayer; }
+            get { return m_NameOfPlayer; }
+        }
+
+        public int Score
+        {
+            get { return m_Score; }
         }
 
         public bool isAi()
@@ -61,6 +67,16 @@ namespace B20_Ex02
             string move = null;
 
             return move;
+        }
+
+        public void NewGame()
+        {
+            m_Score = 0;
+        }
+
+        public void GivePlayerOnePoint()
+        {
+            m_Score++;
         }
     }
 }
