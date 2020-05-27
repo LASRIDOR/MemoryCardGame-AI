@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters;
 using System.Security.Policy;
 using System.Text;
 
@@ -11,17 +12,23 @@ namespace B20_Ex02
     public class UI
     {
         private static readonly int sr_PageWidth = 50;
-        private readonly int r_MaxNumOfRow = 15;
-        private readonly int r_MaxNumOfCol = 27;
-        private readonly char r_SignOfPlaceForGameIcon = 'S';
-        private readonly char[,] m_PresentationBoard;
-        private readonly List<char> r_RowSymbol;
-        private readonly List<char> r_ColSymbol;
+        private static readonly int sr_SpaceForSingleCubeCols = 4;
+        private static readonly int sr_SpaceForSingleCubeRows = 2;
+        private static readonly int sr_SpacesBetweenCoordinatesAndBoardAndEdges = 3;
+        private static readonly int r_LogRows = 6;
+        private static readonly int r_LogCols = 6;
+        private static readonly int r_PhyRows = r_LogRows * sr_SpaceForSingleCubeRows + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
+        private static readonly int r_PhyCols = r_LogCols* sr_SpaceForSingleCubeCols + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
+        private static readonly char r_SignOfPlaceForGameIcon = 'S';
+        private static readonly char[,] m_PresentationBoard;
+        internal static readonly List<char> r_RowSymbol;
+        internal static readonly List<char> r_ColSymbol;
         private List<char> m_IconSymbol;
 
-        public UI()
+        static UI()
         {
-            m_PresentationBoard = new char[r_MaxNumOfRow,r_MaxNumOfCol];
+            UI.printSign("Welcome To Dor's World");
+            m_PresentationBoard = new char[r_PhyRows, r_PhyCols];
             r_RowSymbol = new List<char>(6);
             r_ColSymbol = new List<char>(6);
             makeRowColSymbol();
@@ -76,9 +83,10 @@ namespace B20_Ex02
         {
             string nameOfPlayerOne;
 
-            UI.printSign("Welcome To Dor's World");
+            printSign("Player One Login");
             UI.printPlayerLogin();
             nameOfPlayerOne = System.Console.ReadLine();
+            Ex02.ConsoleUtils.Screen.Clear();
 
             return new Player(nameOfPlayerOne, false);
         }
@@ -88,6 +96,7 @@ namespace B20_Ex02
             string nameOfPlayerTwo = null;
             bool v_IsWantToPlayVsCompter;
 
+            printSign("Player Two Login");
             v_IsWantToPlayVsCompter = ChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
 
             if (v_IsWantToPlayVsCompter == false)
@@ -95,6 +104,8 @@ namespace B20_Ex02
                 UI.printPlayerLogin();
                 nameOfPlayerTwo = System.Console.ReadLine();
             }
+
+            Ex02.ConsoleUtils.Screen.Clear();
 
             return new Player(nameOfPlayerTwo, v_IsWantToPlayVsCompter);
         }
@@ -108,7 +119,7 @@ namespace B20_Ex02
             {
                 UI.printChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
                 playerChoice = System.Console.ReadLine();
-                v_ValidInput = CheckInput.PlayerEnemyChoice(playerChoice);
+                v_ValidInput = CheckInput.IsValidPlayerOneEnemyChoice(playerChoice);
             } while (v_ValidInput == false) ;
 
             return (playerChoice == "1");
@@ -123,26 +134,30 @@ namespace B20_Ex02
             int colOfBoard;
             bool v_SizeIsValid;
 
+            printSign("Choosing Board Size");
+
             do
             {
                 printChoseSizeOfBoard(io_NameOfPlayerOne);
                 sizeOfBoard = System.Console.ReadLine();
-                v_SizeIsValid = CheckInput.BoardSize(sizeOfBoard);
+                v_SizeIsValid = CheckInput.IsValidBoardSize(sizeOfBoard);
             } while (v_SizeIsValid == false);
 
             seperateSizeOfBoard = sizeOfBoard.Split(seperator, 2, StringSplitOptions.RemoveEmptyEntries);
             rowOfBoard = int.Parse(seperateSizeOfBoard[0]);
             colOfBoard = int.Parse(seperateSizeOfBoard[1]);
 
+            Ex02.ConsoleUtils.Screen.Clear();
+
             return new GameBoard(rowOfBoard,colOfBoard);
         }
 
         private void gameRoutineAndKeepScore(GameBoard io_Board,Player io_PlayerOne,Player io_PlayerTwo)
         {
+            eTurn playerTurn = eTurn.PlayerOne;
+
             while (io_Board.gameHasFinished() == false)
             {
-                eTurn playerTurn = eTurn.PlayerOne;
-
                 playerPlayHisTurn(io_Board, io_PlayerOne, io_PlayerTwo, playerTurn);
                 switchTurn(ref playerTurn);
             }
@@ -190,26 +205,38 @@ namespace B20_Ex02
             }
         }
 
+        // Fix: check if chose move has chosen
         private string choseMove(GameBoard io_Board,Player io_Player)
         {
             string move;
-            bool v_MoveIsValid = true;
+            bool v_MoveIsValid;
+            bool v_AlreadyExposed;
+            bool v_ValidPlay;
 
             do
             {
-                printMakeAMove(io_Player, io_Board.NumOfRows, io_Board.NumOfCols);
-                move = System.Console.ReadLine();
-                exitIfQ(move);
-                v_MoveIsValid = CheckInput.CheckValidMove(move, io_Board.NumOfRows, io_Board.NumOfCols);
-            } while (v_MoveIsValid == false);
+                do
+                {
+                    printMakeAMove(io_Player, io_Board.NumOfRows, io_Board.NumOfCols);
+                    move = System.Console.ReadLine();
+                    exitIfQ(move);
+                    v_MoveIsValid = CheckInput.IsValidMove(move, io_Board.NumOfRows, io_Board.NumOfCols);
+                } while (v_MoveIsValid == false);
 
-                return move;
+                int colChose = move[0] - 'A';
+                int rowChose = move[1] - '1';
+                v_AlreadyExposed = CheckInput.checkForExposedCube(io_Board.alreadyExposed(rowChose,colChose));
+                v_ValidPlay = (v_AlreadyExposed == false && v_MoveIsValid == true);
+            } while (v_ValidPlay == false);
+
+            return move;
         }
 
         private int makeAndRepresentTheBoardWithMove(GameBoard io_Board, string io_move)
         {
-            int rowChose = io_move[0] - 'A';
-            int colChose = io_move[1] - '1';
+            int colChose = io_move[0] - 'A';
+            int rowChose = io_move[1] - '1';
+
             int symbolMove = io_Board.ExposeSymbolAndTakeValue(rowChose, colChose);
 
             Ex02.ConsoleUtils.Screen.Clear();
@@ -220,10 +247,10 @@ namespace B20_Ex02
 
         private void cancelLastMove(GameBoard io_Board, string io_FirstMove, string io_SecondMove)
         {
-            int firstMoveRowChose = io_FirstMove[0] - 'A';
-            int firstMoveColChose = io_FirstMove[1] - '1';
-            int secondMoveRowChose = io_SecondMove[0] - 'A';
-            int secondMoveColChose = io_SecondMove[1] - '1';
+            int firstMoveColChose = io_FirstMove[0] - 'A';
+            int firstMoveRowChose = io_FirstMove[1] - '1';
+            int secondMoveColChose = io_SecondMove[0] - 'A';
+            int secondMoveRowChose = io_SecondMove[1] - '1';
 
             io_Board.HideIcon(firstMoveRowChose,firstMoveColChose);
             io_Board.HideIcon(secondMoveRowChose, secondMoveColChose);
@@ -270,12 +297,10 @@ namespace B20_Ex02
         private void announceOnTheWinner(Player io_PlayerOne, Player io_PlayerTwo)
         {
             string theWinner = "Both Of You";
-            string winnerAnnouncment = string.Format(@"The Winner Is {0}", theWinner);
-            string playerAnnouncmentInTable = string.Format(@"   {0} | {1}   ",io_PlayerOne.NameOfPlayer,io_PlayerTwo.NameOfPlayer);
-            string tableFormat = string.Format(@"-----------", io_PlayerOne.NameOfPlayer, io_PlayerTwo.NameOfPlayer);
-            string playerAnnouncment = string.Format(@"   {0} | {1}   ", io_PlayerOne.Score, io_PlayerTwo.Score);
+            string winnerAnnouncment = string.Format("The Winner Is {0}", theWinner);
+            string playerScorePresentation = string.Format("   {0} score is : {1} | {2} score is : {3}  ", io_PlayerOne.NameOfPlayer,io_PlayerOne.Score,io_PlayerTwo.NameOfPlayer,io_PlayerTwo.Score);
 
-            printSign(playerAnnouncmentInTable + tableFormat + playerAnnouncment);
+            printSign(playerScorePresentation);
 
             if (io_PlayerOne.Score > io_PlayerTwo.Score)
             {
@@ -298,7 +323,6 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             bool v_PlayerOneAndTwoIsDesicion;
             bool v_validAnswer;
 
-            Ex02.ConsoleUtils.Screen.Clear();
             System.Console.WriteLine(AnotherGameQuestion);
 
             do
@@ -309,6 +333,11 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
 
             v_PlayerOneAndTwoIsDesicion = (playersAnswer == "Yes" || playersAnswer == "yes");
 
+            if (v_PlayerOneAndTwoIsDesicion == true)
+            {
+                Ex02.ConsoleUtils.Screen.Clear();
+            }
+
             return v_PlayerOneAndTwoIsDesicion;
         }
 
@@ -317,7 +346,7 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             System.String firstAndLastLineOfRectangle = new System.String('-', sr_PageWidth);
             System.String spacesWithPlaceToEdgesOfRectangle = new System.String(' ', sr_PageWidth - 2);
             System.String oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle =
-                new System.String(' ', (sr_PageWidth - 2 - (i_Title.Length)) / 2);
+                new System.String(' ', (sr_PageWidth - 1 - (i_Title.Length)) / 2);
             System.String middleOfRectangle = System.String.Format("|{0}|", spacesWithPlaceToEdgesOfRectangle);
             System.String middleOfRectangleTitleLine = System.String.Format("|{0}{1}{0}|",
                 oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle, i_Title);
@@ -352,40 +381,45 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             System.Console.WriteLine(msg);
         }
 
-        private void printBoard(GameBoard io_board)
+        private void printBoard(GameBoard io_Board)
         {
-            int indexRow = 0;
-            int indexCol = 0;
-            foreach (char c in m_PresentationBoard)
-            {
-                if (c == r_SignOfPlaceForGameIcon)
-                {
-                    if (indexCol == io_board.NumOfCols)
-                    {
-                        indexRow++;
-                        indexCol = 0;
-                    }
+            int numOfRowsInCurrBoard = io_Board.NumOfRows * sr_SpaceForSingleCubeRows + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
+            int numOfColsInCurrBoard = io_Board.NumOfCols * sr_SpaceForSingleCubeCols + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
 
-                    printIconInCube(io_board.GetIconInCoordinate(indexRow,indexCol));
-                    indexCol++;
-                }
-                else
+            for (int i = 0; i < numOfRowsInCurrBoard; i++)
+            {
+                for (int j = 0; j < numOfColsInCurrBoard; j++)
                 {
-                    System.Console.Write(c);
+                    if (m_PresentationBoard[i, j] == r_SignOfPlaceForGameIcon)
+                    {
+                        printIconInCube(getIconInGameBoard(io_Board, i, j));
+                    }
+                    else
+                    {
+                        System.Console.Write(m_PresentationBoard[i,j]);
+                    }
                 }
+
+                System.Console.Write(Environment.NewLine);
             }
         }
 
         private void printIconInCube(int i_SymbolOfIcon)
         {
-            System.Console.WriteLine(m_IconSymbol[i_SymbolOfIcon]);
+            System.Console.Write(m_IconSymbol[i_SymbolOfIcon]);
         }
 
         private void printMakeAMove(Player io_Player, int i_NumOfRows, int i_NumOfCols)
         {
             string msg = String.Format(@"{0} Make a Move:{1}", io_Player.NameOfPlayer,Environment.NewLine);
 
-            System.Console.WriteLine();
+            System.Console.WriteLine(msg);
+        }
+
+        private int getIconInGameBoard(GameBoard io_Board, int io_CurrRowCoordinateOfPresentationBoard, int io_CurrColCoordinateOfPresentationBoard)
+        {
+            return io_Board.GetIconInCoordinate(io_CurrRowCoordinateOfPresentationBoard / sr_SpaceForSingleCubeRows - 1,
+                io_CurrColCoordinateOfPresentationBoard / sr_SpaceForSingleCubeCols - 1);
         }
 
         private void printComputerMakingAMove()
@@ -412,7 +446,7 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             }
         }
 
-        private void makeRowColSymbol()
+        private static void makeRowColSymbol()
         {
             char startOfAlphabet = 'A';
             char startOfNumbers = '1';
@@ -426,52 +460,37 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             }
         }
 
-        private void makeRandSymbolListOfIconAccordingToSizeOfBoard(int i_NumOfRows,int i_NumOfCols)
-        {
-            int numOfIconNeeded = i_NumOfCols * i_NumOfRows / 2;
-            Random random = new Random();
-
-            m_IconSymbol = new List<char>(numOfIconNeeded + 1);
-            m_IconSymbol.Add(' ');
-
-            for (int i = 0; i < numOfIconNeeded; i++)
-            {
-                // range in ascii table with only symbol (more the max board size)
-                int randomNumber = random.Next('!','~'+1);
-                char randIcon = (char)randomNumber;
-
-                m_IconSymbol.Add(randIcon);
-            }
-        }
-
-        private void makePresentationBoard()
+        private static void makePresentationBoard()
         {
             List<char>.Enumerator rowListEnumerator = (List<char>.Enumerator)r_RowSymbol.GetEnumerator();
             List<char>.Enumerator colListEnumerator = (List<char>.Enumerator)r_ColSymbol.GetEnumerator();
 
-            for (int i = 0; i < r_MaxNumOfRow; i++)
+            rowListEnumerator.MoveNext();
+            colListEnumerator.MoveNext();
+
+            for (int i = 0; i < r_PhyRows; i++)
             {
-                for (int j = 0; j < r_MaxNumOfCol; j++)
+                for (int j = 0; j < r_PhyCols; j++)
                 {
-                    if (i == 0 && j % 4 == 0 && j > 1)
+                    if (i == 0 && j % sr_SpaceForSingleCubeCols == 0 && j > 1)
                     {
                         m_PresentationBoard[i, j] = colListEnumerator.Current;
                         colListEnumerator.MoveNext();
                     }
-                    else if (i % 2 == 1 && i > 1 && j == 0)
+                    else if (i % sr_SpaceForSingleCubeRows == 1 && i > 1 && j == 0)
                     {
                         m_PresentationBoard[i, j] = rowListEnumerator.Current;
                         rowListEnumerator.MoveNext();
                     }
-                    else if (i % 2 == 0 && j > 1 && i > 0)
+                    else if (i % sr_SpaceForSingleCubeRows == 0 && j > 1 && i > 0)
                     {
                         m_PresentationBoard[i, j] = '=';
                     }
-                    else if (i % 2 == 1 && i > 1 && j % 4 == 2)
+                    else if (i % sr_SpaceForSingleCubeRows == 1 && i > 1 && j % sr_SpaceForSingleCubeCols == 2)
                     {
                         m_PresentationBoard[i, j] = '|';
                     }
-                    else if (i % 2 == 1 && j % 4 == 0 && i > 1 && j > 1)
+                    else if (i % sr_SpaceForSingleCubeRows == 1 && j % sr_SpaceForSingleCubeCols == 0 && i > 1 && j > 1)
                     {
                         m_PresentationBoard[i, j] = r_SignOfPlaceForGameIcon;
                     }
@@ -481,6 +500,43 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
                     }
                 }
             }
+        }
+
+        private void makeRandSymbolListOfIconAccordingToSizeOfBoard(int i_NumOfRows, int i_NumOfCols)
+        {
+            List<char> listOfAllPossibleIcon;
+            int numOfCharMatchForIcon = '~' - '!';
+            int numOfIconNeeded = i_NumOfCols * i_NumOfRows / 2;
+            Random random = new Random();
+
+            listOfAllPossibleIcon = makeListOfAllPossibleCharacters(numOfCharMatchForIcon);
+
+            // plus one for space icon in symbol 0 (board return 0 if icon is hidden)
+            m_IconSymbol = new List<char>(numOfIconNeeded + 1);
+            m_IconSymbol.Add(' ');
+
+            for (int i = 0; i < numOfIconNeeded; i++)
+            {
+                // range in ascii table with only symbol (more the max board size)
+                int randomNumber = random.Next(0,listOfAllPossibleIcon.Count);
+                m_IconSymbol.Add(listOfAllPossibleIcon[randomNumber]);
+                listOfAllPossibleIcon.RemoveAt(randomNumber);
+            }
+        }
+
+        private List<char> makeListOfAllPossibleCharacters(int i_NumOfCharMatchForIcon)
+        {
+            // range in ascii table with only symbol (more the max board size)
+            List<char> allPossibleChar = new List<char>(i_NumOfCharMatchForIcon);
+            char startOfPossibleCharForIcon = '!';
+
+            for (int i = 0; i < i_NumOfCharMatchForIcon; i++)
+            {
+                allPossibleChar.Add(startOfPossibleCharForIcon);
+                startOfPossibleCharForIcon++;
+            }
+
+            return allPossibleChar;
         }
         /*
         public static void PrintBoard(BoardGame io_Board)

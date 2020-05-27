@@ -111,6 +111,11 @@ namespace B20_Ex02
             return v_GameOver;
         }
 
+        public bool alreadyExposed(int io_Row, int io_Col)
+        {
+            return m_Board[io_Row, io_Col].IsHidden == false;
+        }
+
         private void boardPreparartion()
         {
             int numOfIcons = r_NumOfCols * r_NumOfRows;
