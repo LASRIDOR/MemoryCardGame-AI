@@ -8,6 +8,7 @@ namespace B20_Ex02
             UI setGame = new UI();
 
             setGame.PlayMatchGame();
+
             // wait for enter
             System.Console.WriteLine("Please press 'Enter' to exit...");
             System.Console.ReadLine();

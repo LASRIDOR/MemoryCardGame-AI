@@ -11,6 +11,8 @@ namespace B20_Ex02
 
     public class UI
     {
+        private Player m_PlayerOne;
+        private Player m_PlayerTwo;
         private static readonly int sr_PageWidth = 50;
         private static readonly int sr_SpaceForSingleCubeCols = 4;
         private static readonly int sr_SpaceForSingleCubeRows = 2;
@@ -27,7 +29,6 @@ namespace B20_Ex02
 
         static UI()
         {
-            UI.printSign("Welcome To Dor's World");
             m_PresentationBoard = new char[r_PhyRows, r_PhyCols];
             r_RowSymbol = new List<char>(6);
             r_ColSymbol = new List<char>(6);
@@ -35,10 +36,15 @@ namespace B20_Ex02
             makePresentationBoard();
         }
 
-        public enum eTurn
+        private enum eTurn
         {
             PlayerOne = 1,
             PlayerTwo = 2
+        }
+        private enum eMoveNum
+        {
+            FirstMove = 1,
+            SecondMove = 2
         }
 
         /*
@@ -61,19 +67,22 @@ namespace B20_Ex02
         */
         public void PlayMatchGame()
         {
-            Player playerOne = playerOneLogin();
-            Player playerTwo = playerTwoLogin(playerOne.NameOfPlayer);
+            UI.printSign("Welcome To Dor's World");
+            m_PlayerOne = playerOneLogin();
+            m_PlayerTwo = playerTwoLogin(m_PlayerOne.NameOfPlayer);
             bool v_WantToPlayAnotherGame ;
 
             do
             {
-                GameBoard board = makeGameBoard(playerOne.NameOfPlayer);
+                GameBoard board = makeGameBoard();
+                m_PlayerOne.NewGame(null,null);
+                m_PlayerTwo.NewGame(board.NumOfRows,board.NumOfCols);
 
                 makeRandSymbolListOfIconAccordingToSizeOfBoard(board.NumOfRows, board.NumOfCols);
                 printBoard(board);
-                gameRoutineAndKeepScore(board, playerOne, playerTwo);
-                announceOnTheWinner(playerOne,playerTwo);
-                v_WantToPlayAnotherGame = askForAnotherGame(playerOne, playerTwo);
+                gameRoutineAndKeepScore(board);
+                announceOnTheWinner(m_PlayerOne, m_PlayerTwo);
+                v_WantToPlayAnotherGame = askForAnotherGame(m_PlayerOne, m_PlayerTwo);
 
                 m_IconSymbol.Clear();
             } while (v_WantToPlayAnotherGame == true) ;
@@ -120,12 +129,13 @@ namespace B20_Ex02
                 UI.printChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
                 playerChoice = System.Console.ReadLine();
                 v_ValidInput = CheckInput.IsValidPlayerOneEnemyChoice(playerChoice);
+
             } while (v_ValidInput == false) ;
 
             return (playerChoice == "1");
         }
 
-        private GameBoard makeGameBoard(string io_NameOfPlayerOne)
+        private GameBoard makeGameBoard()
         {
             string sizeOfBoard;
             string[] seperator = {"x"};
@@ -138,9 +148,10 @@ namespace B20_Ex02
 
             do
             {
-                printChoseSizeOfBoard(io_NameOfPlayerOne);
+                printChoseSizeOfBoardForPlayerOne();
                 sizeOfBoard = System.Console.ReadLine();
                 v_SizeIsValid = CheckInput.IsValidBoardSize(sizeOfBoard);
+
             } while (v_SizeIsValid == false);
 
             seperateSizeOfBoard = sizeOfBoard.Split(seperator, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -152,18 +163,18 @@ namespace B20_Ex02
             return new GameBoard(rowOfBoard,colOfBoard);
         }
 
-        private void gameRoutineAndKeepScore(GameBoard io_Board,Player io_PlayerOne,Player io_PlayerTwo)
+        private void gameRoutineAndKeepScore(GameBoard io_Board)
         {
             eTurn playerTurn = eTurn.PlayerOne;
 
             while (io_Board.gameHasFinished() == false)
             {
-                playerPlayHisTurn(io_Board, io_PlayerOne, io_PlayerTwo, playerTurn);
+                playerMakeMoveHisTurn(io_Board, playerTurn);
                 switchTurn(ref playerTurn);
             }
         }
-
-        private void playerPlayHisTurn(GameBoard io_Board, Player io_PlayerOne, Player io_PlayerTwo, eTurn i_PlayerTurn)
+        /*
+        private void playerPlayHisTurn(GameBoard io_Board, eTurn i_PlayerTurn)
         {
             if (i_PlayerTurn == eTurn.PlayerOne)
             {
@@ -181,32 +192,44 @@ namespace B20_Ex02
                 }
             }
         }
-
-        private void humanMove(GameBoard io_Board, Player io_Player)
+        */
+        private void playerMakeMoveHisTurn(GameBoard io_Board, eTurn io_PlayingPlayer)
         {
-            string firstMove = choseMove(io_Board, io_Player);
+            eMoveNum moveNum = eMoveNum.FirstMove;
+            string firstMove = choseMove(io_Board, io_PlayingPlayer, moveNum, null, null);
             int symbolOfFirstMove;
 
             symbolOfFirstMove = makeAndRepresentTheBoardWithMove(io_Board, firstMove);
+            //tellAiAboutTheCard(firstMove, symbolOfFirstMove);
 
-            string secondMove = choseMove(io_Board, io_Player);
+            moveNum = eMoveNum.SecondMove;
+            string secondMove = choseMove(io_Board, io_PlayingPlayer, moveNum, firstMove, symbolOfFirstMove);
             int symbolOfSecondMove;
 
             symbolOfSecondMove = makeAndRepresentTheBoardWithMove(io_Board, secondMove);
+            //tellAiAboutTheCard(secondMove, symbolOfSecondMove);
 
             if (symbolOfSecondMove != symbolOfFirstMove)
             {
                 System.Threading.Thread.Sleep(200);
+                m_PlayerTwo.AiBrain.cardsRevealed(firstMove, symbolOfFirstMove);
+                m_PlayerTwo.AiBrain.cardsRevealed(secondMove, symbolOfSecondMove);
                 cancelLastMove(io_Board, firstMove, secondMove);
             }
             else
             {
-                io_Player.GivePlayerOnePoint();
+                if (io_PlayingPlayer == eTurn.PlayerOne)
+                {
+                    m_PlayerOne.GivePlayerOnePoint();
+                }
+                else
+                {
+                    m_PlayerTwo.GivePlayerOnePoint();
+                }
             }
         }
 
-        // Fix: check if chose move has chosen
-        private string choseMove(GameBoard io_Board,Player io_Player)
+        private string choseMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, string i_FirstMoveCardRevealed, int? i_SymbolOfFirstMoveCardRevealed)
         {
             string move;
             bool v_MoveIsValid;
@@ -217,17 +240,55 @@ namespace B20_Ex02
             {
                 do
                 {
-                    printMakeAMove(io_Player, io_Board.NumOfRows, io_Board.NumOfCols);
-                    move = System.Console.ReadLine();
+                    printMakeAMove(io_PlayingPlayer);
+                    move = playingPlayerMakeAMove(io_PlayingPlayer, i_MoveNum, i_FirstMoveCardRevealed, i_SymbolOfFirstMoveCardRevealed);
+                    //move = System.Console.ReadLine();
                     exitIfQ(move);
                     v_MoveIsValid = CheckInput.IsValidMove(move, io_Board.NumOfRows, io_Board.NumOfCols);
+
                 } while (v_MoveIsValid == false);
 
                 int colChose = move[0] - 'A';
                 int rowChose = move[1] - '1';
                 v_AlreadyExposed = CheckInput.checkForExposedCube(io_Board.alreadyExposed(rowChose,colChose));
                 v_ValidPlay = (v_AlreadyExposed == false && v_MoveIsValid == true);
+
             } while (v_ValidPlay == false);
+
+            return move;
+        }
+
+        private string playingPlayerMakeAMove(eTurn io_PlayingPlayer, eMoveNum i_MoveNum, string i_FirstMoveCardRevealed, int? i_SymbolOfFirstMoveCardRevealed)
+        {
+            string move;
+
+            if (io_PlayingPlayer == eTurn.PlayerOne)
+            {
+                move = System.Console.ReadLine();
+            }
+            else
+            {
+                if (m_PlayerTwo.isAi() == true)
+                {
+                    printComputerMakingAMove();
+
+                    if (i_MoveNum == eMoveNum.FirstMove)
+                    {
+                        move = m_PlayerTwo.AiBrain.MaikngFirstMove();
+                    }
+                    else
+                    {
+                        move = m_PlayerTwo.AiBrain.MaikngSecondMove(i_FirstMoveCardRevealed, i_SymbolOfFirstMoveCardRevealed.Value);
+                    }
+
+                    System.Console.Write(move);
+                    System.Threading.Thread.Sleep(400);
+                }
+                else
+                {
+                    move = System.Console.ReadLine();
+                }
+            }
 
             return move;
         }
@@ -257,7 +318,7 @@ namespace B20_Ex02
             Ex02.ConsoleUtils.Screen.Clear();
             printBoard(io_Board);
         }
-
+        /*
         private void aiMove(GameBoard io_Board, Player io_Player)
         {
             string firstMove = io_Player.MakeFirstMove();
@@ -265,22 +326,26 @@ namespace B20_Ex02
 
             printComputerMakingAMove();
             symbolOfFirstMove = makeAndRepresentTheBoardWithMove(io_Board, firstMove);
-            System.Threading.Thread.Sleep(200);
+            System.Threading.Thread.Sleep(400);
 
             string secondMove = io_Player.MakeSecondMove(symbolOfFirstMove);
             int symbolOfSecondMove;
 
             printComputerMakingAMove();
             symbolOfSecondMove = makeAndRepresentTheBoardWithMove(io_Board, secondMove);
-            System.Threading.Thread.Sleep(200);
+            System.Threading.Thread.Sleep(400);
 
             if (symbolOfSecondMove != symbolOfFirstMove)
             {
                 System.Threading.Thread.Sleep(200);
                 cancelLastMove(io_Board, firstMove, secondMove);
             }
+            else
+            {
+                io_Player.GivePlayerOnePoint();
+            }
         }
-
+        */
         private void switchTurn(ref eTurn o_PlayerCurrentTurn)
         {
             if (o_PlayerCurrentTurn == eTurn.PlayerOne)
@@ -373,10 +438,10 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             System.Console.WriteLine(msg);
         }
 
-        private static void printChoseSizeOfBoard(string io_NameOfPlayerOne)
+        private void printChoseSizeOfBoardForPlayerOne()
         {
             string msg = String.Format(@"{0} I need you to determine the size of the board
-(Max size is 6 & Min size is 4 & make sure you enter an even number) Example of Input: 6x4", io_NameOfPlayerOne);
+(Max size is 6 & Min size is 4 & make sure you enter an even number) Example of Input: 6x4", m_PlayerOne.NameOfPlayer);
 
             System.Console.WriteLine(msg);
         }
@@ -409,9 +474,20 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
             System.Console.Write(m_IconSymbol[i_SymbolOfIcon]);
         }
 
-        private void printMakeAMove(Player io_Player, int i_NumOfRows, int i_NumOfCols)
+        private void printMakeAMove(eTurn io_PlayingPlayer)
         {
-            string msg = String.Format(@"{0} Make a Move:{1}", io_Player.NameOfPlayer,Environment.NewLine);
+            string playingPlayer;
+
+            if (io_PlayingPlayer == eTurn.PlayerOne)
+            {
+                playingPlayer = m_PlayerOne.NameOfPlayer;
+            }
+            else
+            {
+                playingPlayer = m_PlayerTwo.NameOfPlayer;
+            }
+
+            string msg = String.Format("{0} Make a Move:{1}", playingPlayer, Environment.NewLine);
 
             System.Console.WriteLine(msg);
         }

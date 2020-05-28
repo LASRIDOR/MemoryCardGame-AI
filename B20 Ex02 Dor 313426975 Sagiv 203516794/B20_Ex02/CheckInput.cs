@@ -13,7 +13,7 @@ namespace B20_Ex02
          //   return UI.r_ColSymbol.Contains(io_Row) && UI.r_RowSymbol.Contains(io_Col);
         //}
 
-        public static bool IsValidPlayerOneEnemyChoice(string io_Choice)
+        internal static bool IsValidPlayerOneEnemyChoice(string io_Choice)
         {
             bool v_ValidEnemyCoice = io_Choice == "1" || io_Choice == "0";
 
@@ -24,7 +24,7 @@ namespace B20_Ex02
 
             return v_ValidEnemyCoice;
         }
-        public static bool IsValidBoardSize(string io_BoardSize)
+        internal static bool IsValidBoardSize(string io_BoardSize)
         {
             string[] seperateBoardSize = new string[io_BoardSize.Length];
 

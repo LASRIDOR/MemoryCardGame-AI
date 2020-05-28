@@ -31,6 +31,7 @@ namespace B20_Ex02
         {
             private readonly int m_SymbolOfIcon;
             private bool v_IsHidden;
+
             public Cube(int i_Icon, bool i_IsHidden)
             {
                 m_SymbolOfIcon = i_Icon;
