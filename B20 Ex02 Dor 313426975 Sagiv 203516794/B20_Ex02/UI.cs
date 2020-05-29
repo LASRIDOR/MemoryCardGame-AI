@@ -211,9 +211,7 @@ namespace B20_Ex02
 
             if (symbolOfSecondMove != symbolOfFirstMove)
             {
-                System.Threading.Thread.Sleep(200);
-                m_PlayerTwo.AiBrain.cardsRevealed(firstMove, symbolOfFirstMove);
-                m_PlayerTwo.AiBrain.cardsRevealed(secondMove, symbolOfSecondMove);
+                System.Threading.Thread.Sleep(2000);
                 cancelLastMove(io_Board, firstMove, secondMove);
             }
             else
@@ -227,6 +225,8 @@ namespace B20_Ex02
                     m_PlayerTwo.GivePlayerOnePoint();
                 }
             }
+
+            m_PlayerTwo.AiBrain.cardsRevealed(firstMove, symbolOfFirstMove, secondMove, symbolOfSecondMove);
         }
 
         private string choseMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, string i_FirstMoveCardRevealed, int? i_SymbolOfFirstMoveCardRevealed)
@@ -242,7 +242,6 @@ namespace B20_Ex02
                 {
                     printMakeAMove(io_PlayingPlayer);
                     move = playingPlayerMakeAMove(io_PlayingPlayer, i_MoveNum, i_FirstMoveCardRevealed, i_SymbolOfFirstMoveCardRevealed);
-                    //move = System.Console.ReadLine();
                     exitIfQ(move);
                     v_MoveIsValid = CheckInput.IsValidMove(move, io_Board.NumOfRows, io_Board.NumOfCols);
 
@@ -250,12 +249,17 @@ namespace B20_Ex02
 
                 int colChose = move[0] - 'A';
                 int rowChose = move[1] - '1';
-                v_AlreadyExposed = CheckInput.checkForExposedCube(io_Board.alreadyExposed(rowChose,colChose));
+                v_AlreadyExposed = CheckInput.IssueErrorMessageExposedCube(HaventBeenExposedYet(io_Board, rowChose, colChose));
                 v_ValidPlay = (v_AlreadyExposed == false && v_MoveIsValid == true);
 
             } while (v_ValidPlay == false);
 
             return move;
+        }
+
+        private bool HaventBeenExposedYet(GameBoard io_Board,int i_Row, int i_Col)
+        {
+            return io_Board.alreadyExposed(i_Row, i_Col);
         }
 
         private string playingPlayerMakeAMove(eTurn io_PlayingPlayer, eMoveNum i_MoveNum, string i_FirstMoveCardRevealed, int? i_SymbolOfFirstMoveCardRevealed)
@@ -282,7 +286,7 @@ namespace B20_Ex02
                     }
 
                     System.Console.Write(move);
-                    System.Threading.Thread.Sleep(400);
+                    System.Threading.Thread.Sleep(2000);
                 }
                 else
                 {
@@ -500,18 +504,18 @@ Do You Want To Play Another Game (Yes Or No)", io_PlayerOne, io_PlayerTwo);
 
         private void printComputerMakingAMove()
         {
-            System.Console.WriteLine("RoboMatch Making His Move");
-            System.Threading.Thread.Sleep(50);
+            System.Console.Write("RoboMatch Making His Move");
+            System.Threading.Thread.Sleep(400);
+            System.Console.Write(".");
+            System.Threading.Thread.Sleep(400);
+            System.Console.Write(".");
+            System.Threading.Thread.Sleep(400);
+            System.Console.Write(".");
+            System.Threading.Thread.Sleep(400);
+            System.Console.Write(".");
+            System.Threading.Thread.Sleep(400);
             System.Console.WriteLine(".");
-            System.Threading.Thread.Sleep(50);
-            System.Console.WriteLine(".");
-            System.Threading.Thread.Sleep(50);
-            System.Console.WriteLine(".");
-            System.Threading.Thread.Sleep(50);
-            System.Console.WriteLine(".");
-            System.Threading.Thread.Sleep(50);
-            System.Console.WriteLine(".");
-            System.Threading.Thread.Sleep(50);
+            System.Threading.Thread.Sleep(400);
         }
 
         private void exitIfQ(string i_Move)

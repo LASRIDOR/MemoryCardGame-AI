@@ -109,7 +109,7 @@ namespace B20_Ex02
             return v_IsSize && v_FirstLetterIsvalid && v_SecondLetterIsvalid;
         }
 
-        public static bool  checkForExposedCube(bool io_AlreadyExposed)
+        public static bool IssueErrorMessageExposedCube(bool io_AlreadyExposed)
         {
             if (io_AlreadyExposed == true)
             {
