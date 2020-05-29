@@ -365,8 +365,7 @@ namespace B20_Ex02
 
         private void announceOnTheWinner(Player io_PlayerOne, Player io_PlayerTwo)
         {
-            string theWinner = "Both Of You";
-            string winnerAnnouncment = string.Format("The Winner Is {0}", theWinner);
+            string theWinner;
             string playerScorePresentation = string.Format("   {0} score is : {1} | {2} score is : {3}  ", io_PlayerOne.NameOfPlayer,io_PlayerOne.Score,io_PlayerTwo.NameOfPlayer,io_PlayerTwo.Score);
 
             printSign(playerScorePresentation);
@@ -379,7 +378,12 @@ namespace B20_Ex02
             {
                 theWinner = io_PlayerTwo.NameOfPlayer;
             }
+            else
+            {
+                theWinner = "Both Of You";
+            }
 
+            string winnerAnnouncment = string.Format("The Winner Is {0}", theWinner);
 
             printSign(winnerAnnouncment);
         }
