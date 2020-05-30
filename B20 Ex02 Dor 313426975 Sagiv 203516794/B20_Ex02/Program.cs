@@ -1,5 +1,4 @@
-﻿
-namespace B20_Ex02
+﻿namespace B20_Ex02
 {
     public class Program
     {
@@ -13,6 +12,5 @@ namespace B20_Ex02
             System.Console.WriteLine("Please press 'Enter' to exit...");
             System.Console.ReadLine();
         }
-
     }
 }

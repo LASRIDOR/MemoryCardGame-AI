@@ -4,7 +4,7 @@ using System.Text;
 
 namespace B20_Ex02
 {
-    class GameBoard
+    public class GameBoard
     {
         private readonly int r_NumOfRows;
         private readonly int r_NumOfCols;
@@ -22,6 +22,7 @@ namespace B20_Ex02
         {
             get { return r_NumOfRows; }
         }
+
         public int NumOfCols
         {
             get { return r_NumOfCols; }
@@ -40,14 +41,8 @@ namespace B20_Ex02
 
             public bool IsHidden
             {
-                set
-                {
-                    IsHidden = value;
-                }
-                get
-                {
-                    return v_IsHidden;
-                }
+                get { return v_IsHidden; }
+                set { IsHidden = value; }
             }
 
             public int SymbolOfIcon
@@ -55,6 +50,7 @@ namespace B20_Ex02
                 get
                 {
                     int result;
+
                     if (IsHidden == true)
                     {
                         result = 0;
@@ -79,11 +75,11 @@ namespace B20_Ex02
             }
         }
 
-        public int ExposeSymbolAndTakeValue(int i_rowNum, int i_colNum)
+        public int ExposeSymbolAndTakeValue(Coordinate i_MoveCoordinate)
         {
-            m_Board[i_rowNum,i_colNum].ExposeCube();
+            m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].ExposeCube();
 
-            return m_Board[i_rowNum, i_colNum].SymbolOfIcon;
+            return m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].SymbolOfIcon;
         }
 
         public int GetIconInCoordinate(int i_rowNum, int i_colNum)
@@ -91,9 +87,9 @@ namespace B20_Ex02
             return m_Board[i_rowNum, i_colNum].SymbolOfIcon;
         }
 
-        public void HideIcon(int i_rowNum, int i_colNum)
+        public void HideIcon(Coordinate i_MoveCoordinate)
         {
-            m_Board[i_rowNum,i_colNum].HideCube();
+            m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].HideCube();
         }
 
         public bool gameHasFinished()
@@ -105,6 +101,7 @@ namespace B20_Ex02
                 if (cube.IsHidden == true)
                 {
                     v_GameOver = false;
+
                     break;
                 }
             }
@@ -112,9 +109,9 @@ namespace B20_Ex02
             return v_GameOver;
         }
 
-        public bool alreadyExposed(int io_Row, int io_Col)
+        public bool alreadyExposed(Coordinate i_CurrMoveCoordinate)
         {
-            return m_Board[io_Row, io_Col].IsHidden == false;
+            return m_Board[i_CurrMoveCoordinate.Row, i_CurrMoveCoordinate.Col].IsHidden == false;
         }
 
         private void boardPreparartion()
@@ -148,6 +145,5 @@ namespace B20_Ex02
                 }
             }
         }
-
     }
 }

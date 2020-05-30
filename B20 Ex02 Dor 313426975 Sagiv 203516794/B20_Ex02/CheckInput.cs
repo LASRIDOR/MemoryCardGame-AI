@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Configuration;
 using System.Text;
 
 namespace B20_Ex02
 {
     internal class CheckInput
     {
-
-        // check
-        //public static bool CheckValidCorrdinateInBoardGame(char io_Row, char io_Col)
-        //{
-         //   return UI.r_ColSymbol.Contains(io_Row) && UI.r_RowSymbol.Contains(io_Col);
-        //}
-
         internal static bool IsValidPlayerOneEnemyChoice(string io_Choice)
         {
             bool v_ValidEnemyCoice = io_Choice == "1" || io_Choice == "0";
@@ -24,6 +18,7 @@ namespace B20_Ex02
 
             return v_ValidEnemyCoice;
         }
+
         internal static bool IsValidBoardSize(string io_BoardSize)
         {
             string[] seperateBoardSize = new string[io_BoardSize.Length];
@@ -35,7 +30,7 @@ namespace B20_Ex02
 
             int rowOfBoard;
             int colOfBoard;
-            bool v_IsSizeThree = (io_BoardSize.Length == 3);
+            bool v_IsSizeThree;
             bool v_FirstNumValid;
             bool v_SeperatorXValid;
             bool v_TwoNumValid;
@@ -44,6 +39,8 @@ namespace B20_Ex02
             bool v_IsEven;
             bool v_IsInOfRange;
             bool v_isValidBoardSize;
+
+            v_IsSizeThree = io_BoardSize.Length == 3;
 
             if (v_IsSizeThree == true)
             {
@@ -55,7 +52,7 @@ namespace B20_Ex02
                 v_IsInOfRange = v_FirstNumValid == true && v_TwoNumValid == true;
                 v_FirstCharIsNumbers = int.TryParse(seperateBoardSize[0], out rowOfBoard);
                 v_LasriCharIsNumbers = int.TryParse(seperateBoardSize[2], out colOfBoard);
-                v_IsEven = ((rowOfBoard * colOfBoard) % 2 == 0);
+                v_IsEven = (rowOfBoard * colOfBoard) % 2 == 0;
                 v_isValidBoardSize = v_IsSizeThree && v_FirstNumValid && v_SeperatorXValid && v_TwoNumValid &&
                                           v_FirstCharIsNumbers && v_LasriCharIsNumbers && v_IsEven && v_IsInOfRange;
                 if(v_isValidBoardSize == false)
@@ -85,20 +82,31 @@ namespace B20_Ex02
             return v_isValidBoardSize;
         }
 
-        public static bool IsValidMove(string i_Move, int i_NumOfRows, int i_NumOfCols)
+        internal static bool IsValidMove(string i_Move, int i_NumOfRows, int i_NumOfCols)
         {
-            bool v_IsSize = (i_Move.Length == 2);
+            bool v_IsSize = i_Move.Length == 2;
             bool v_FirstLetterIsvalid = false;
             bool v_SecondLetterIsvalid = false;
+            bool v_InRange = false;
 
             if (v_IsSize == true)
             {
-                v_FirstLetterIsvalid = (UI.r_ColSymbol.Contains(i_Move[0]));
-                v_SecondLetterIsvalid = (UI.r_RowSymbol.Contains(i_Move[1]));
+                v_FirstLetterIsvalid = UI.r_ColSymbol.Contains(i_Move[0]);
+                v_SecondLetterIsvalid = UI.r_RowSymbol.Contains(i_Move[1]);
 
-                if (v_FirstLetterIsvalid == false || v_SecondLetterIsvalid == false)
+                if (v_SecondLetterIsvalid == true && v_FirstLetterIsvalid == true)
                 {
-                    System.Console.WriteLine("You Choice a Wrong Symbol of Row Or Col");
+                    v_InRange = ((i_Move[0] <= UI.r_ColSymbol[i_NumOfCols - 1]) && (i_Move[0] >= UI.r_ColSymbol[0])) &&
+                                ((i_Move[1] <= UI.r_RowSymbol[i_NumOfRows - 1]) && (i_Move[1] >= UI.r_RowSymbol[0]));
+
+                    if (v_InRange == false)
+                    {
+                        System.Console.WriteLine("Out Of Range");
+                    }
+                }
+                else
+                {
+                    System.Console.WriteLine("You Choice a Wrong Symbol of Row Or Col (in Capslk)");
                 }
             }
             else
@@ -106,10 +114,10 @@ namespace B20_Ex02
                 printInputIsValid();
             }
 
-            return v_IsSize && v_FirstLetterIsvalid && v_SecondLetterIsvalid;
+            return v_IsSize && v_FirstLetterIsvalid && v_SecondLetterIsvalid && v_InRange;
         }
 
-        public static bool IssueErrorMessageExposedCube(bool io_AlreadyExposed)
+        internal static bool IssueErrorMessageExposedCube(bool io_AlreadyExposed)
         {
             if (io_AlreadyExposed == true)
             {
@@ -123,7 +131,8 @@ namespace B20_Ex02
         {
             System.Console.WriteLine("Your Choice Is Wrong Try Again (invalid input)");
         }
-        public static bool CheckValidAnswerForAnotherGameQuestion(string i_PlayersAnswer)
+
+        internal static bool CheckValidAnswerForAnotherGameQuestion(string i_PlayersAnswer)
         {
             bool v_validAnswer = i_PlayersAnswer == "Yes" || i_PlayersAnswer == "yes" || i_PlayersAnswer == "No" || i_PlayersAnswer == "no";
 
