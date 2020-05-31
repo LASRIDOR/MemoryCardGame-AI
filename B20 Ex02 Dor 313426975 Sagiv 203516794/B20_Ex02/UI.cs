@@ -402,7 +402,7 @@ namespace B20_Ex02
         {
             string msg =
                 string.Format(
-                    "{0} I need you to determine the size of the board{1}(Max size is 6 & Min size is 4 & make sure you enter an even number) Example of Input: 6x4", m_PlayerOne.NameOfPlayer, Environment.NewLine);
+                    "{0} I need you to determine the size of the board{1}Max size is 6 and Min size is 4 and make sure you enter an even number of square{1}Example of Input: 6x4", m_PlayerOne.NameOfPlayer, Environment.NewLine);
 
             System.Console.WriteLine(msg);
         }
