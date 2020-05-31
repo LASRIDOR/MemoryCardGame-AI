@@ -6,12 +6,12 @@ namespace B20_Ex02
     public class Player
     {
         private readonly string r_NameOfPlayer;
+        private readonly Ai r_AiBrain;
         private int m_Score;
-        private readonly Ai m_AiBrain;
 
         public Ai AiBrain
         {
-            get { return m_AiBrain;}
+            get { return r_AiBrain; }
         }
 
         public Player(string i_NameOfPlayer, bool isAi)
@@ -19,12 +19,12 @@ namespace B20_Ex02
             if (isAi == true)
             {
                 r_NameOfPlayer = "RoboMatch";
-                m_AiBrain = new Ai();
+                r_AiBrain = new Ai();
             }
             else
             {
                 r_NameOfPlayer = i_NameOfPlayer;
-                m_AiBrain = null;
+                r_AiBrain = null;
             }
         }
 
@@ -40,7 +40,7 @@ namespace B20_Ex02
 
         public bool IsAi()
         {
-            if (m_AiBrain == null)
+            if (r_AiBrain == null)
             {
                 return false;
             }
@@ -74,11 +74,11 @@ namespace B20_Ex02
 
                 if (m_MyNextKindMove == ePlayingStrategy.TwoMove || m_MyNextKindMove == ePlayingStrategy.OneMove)
                 {
-                    firstMove = getCardForMove(false);
+                    firstMove = getCardForCurrMoveOnKnowingDemand(false);
                 }
                 else if (m_MyNextKindMove == ePlayingStrategy.ZeroMove)
                 {
-                    firstMove = getCardForMove(true);
+                    firstMove = getCardForCurrMoveOnKnowingDemand(true);
                 }
                 else
                 {
@@ -104,17 +104,17 @@ namespace B20_Ex02
                     {
                         if (m_MyNextKindMove == ePlayingStrategy.TwoMove)
                         {
-                            secondMove = getCardForMove(false);
+                            secondMove = getCardForCurrMoveOnKnowingDemand(false);
                         }
                         else
                         {
-                            secondMove = getCardForMove(true);
+                            secondMove = getCardForCurrMoveOnKnowingDemand(true);
                         }
                     }
                 }
                 else if(m_MyNextKindMove == ePlayingStrategy.ZeroMove)
                 {
-                    secondMove = getCardForMove(true);
+                    secondMove = getCardForCurrMoveOnKnowingDemand(true);
                 }
                 else
                 {
@@ -125,7 +125,7 @@ namespace B20_Ex02
                 return secondMove;
             }
 
-            private Coordinate getCardForMove(bool i_NeedKnownCard)
+            private Coordinate getCardForCurrMoveOnKnowingDemand(bool i_NeedKnownCard)
             {
                 Coordinate move;
                 bool v_FoundMove = false;
@@ -151,7 +151,7 @@ namespace B20_Ex02
                 return move;
             }
 
-            public void CardsRevealed(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
+            public void SetCardRevealedFromLastMove(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
             {
                 if (i_FirstMoveSymbol == i_SecondMoveSymbol)
                 {
@@ -251,7 +251,7 @@ namespace B20_Ex02
 
         public void NewGame(int? i_NumOfRow, int? i_NumOfCol)
         {
-            if (m_AiBrain != null)
+            if (r_AiBrain != null)
             {
                 AiBrain.ResetMermory(i_NumOfRow.Value, i_NumOfCol.Value);
             }

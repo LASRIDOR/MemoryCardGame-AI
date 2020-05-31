@@ -91,7 +91,7 @@ namespace B20_Ex02
             m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].HideCube();
         }
 
-        public bool GameHasFinished()
+        public bool checkIfGamehasFinished()
         {
             bool v_GameOver = true;
 
@@ -108,7 +108,7 @@ namespace B20_Ex02
             return v_GameOver;
         }
 
-        public bool AlreadyExposed(Coordinate i_CurrMoveCoordinate)
+        public bool CheckIfAlreadyExposed(Coordinate i_CurrMoveCoordinate)
         {
             return m_Board[i_CurrMoveCoordinate.Row, i_CurrMoveCoordinate.Col].IsHidden == false;
         }

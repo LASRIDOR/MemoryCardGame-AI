@@ -140,7 +140,7 @@ namespace B20_Ex02
             bool v_WantToPlayVsCompter;
 
             printSign("Player Two Login");
-            v_WantToPlayVsCompter = choosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
+            v_WantToPlayVsCompter = playerOneChoosingCompetition(io_NameOfPlayerOne);
 
             if (v_WantToPlayVsCompter == false)
             {
@@ -154,14 +154,14 @@ namespace B20_Ex02
             return new Player(nameOfPlayerTwo, v_WantToPlayVsCompter);
         }
 
-        private bool choosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
+        private bool playerOneChoosingCompetition(string i_NameOfPlayerOne)
         {
             string playerChoice;
             bool v_ValidInput;
 
             do
             {
-                printChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
+                printChoosingOfCompetitionForPlayerOne(i_NameOfPlayerOne);
                 playerChoice = System.Console.ReadLine();
                 exitIfQ(playerChoice);
                 v_ValidInput = CheckInput.IsValidPlayerOneEnemyChoice(playerChoice);
@@ -203,35 +203,35 @@ namespace B20_Ex02
         {
             eTurn playerTurn = eTurn.PlayerOne;
 
-            while (io_Board.GameHasFinished() == false)
+            while (io_Board.checkIfGamehasFinished() == false)
             {
                 playerMakeMoveHisTurn(io_Board, playerTurn);
                 switchTurn(ref playerTurn);
             }
         }
 
-        private void playerMakeMoveHisTurn(GameBoard io_Board, eTurn io_PlayingPlayer)
+        private void playerMakeMoveHisTurn(GameBoard io_Board, eTurn i_PlayingPlayer)
         {
             eMoveNum moveNum = eMoveNum.FirstMove;
-            Coordinate firstMoveCoordinate = choseMove(io_Board, io_PlayingPlayer, moveNum, null);
+            Coordinate firstMoveCoordinate = askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(io_Board, i_PlayingPlayer, moveNum, null);
             int symbolOfFirstMove;
 
-            symbolOfFirstMove = makeAndRepresentTheBoardWithMove(io_Board, firstMoveCoordinate);
+            symbolOfFirstMove = representTheBoardWithMove(io_Board, firstMoveCoordinate);
 
             moveNum = eMoveNum.SecondMove;
-            Coordinate secondMoveCoordinate = choseMove(io_Board, io_PlayingPlayer, moveNum, symbolOfFirstMove);
+            Coordinate secondMoveCoordinate = askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(io_Board, i_PlayingPlayer, moveNum, symbolOfFirstMove);
             int symbolOfSecondMove;
 
-            symbolOfSecondMove = makeAndRepresentTheBoardWithMove(io_Board, secondMoveCoordinate);
+            symbolOfSecondMove = representTheBoardWithMove(io_Board, secondMoveCoordinate);
 
             if (symbolOfSecondMove != symbolOfFirstMove)
             {
                 System.Threading.Thread.Sleep(2000);
-                cancelLastMove(io_Board, firstMoveCoordinate, secondMoveCoordinate);
+                cancelLastPlayingPlayerPlay(io_Board, firstMoveCoordinate, secondMoveCoordinate);
             }
             else
             {
-                if (io_PlayingPlayer == eTurn.PlayerOne)
+                if (i_PlayingPlayer == eTurn.PlayerOne)
                 {
                     m_PlayerOne.GivePlayerOnePoint();
                 }
@@ -241,10 +241,10 @@ namespace B20_Ex02
                 }
             }
 
-            m_PlayerTwo.AiBrain.CardsRevealed(firstMoveCoordinate, symbolOfFirstMove, secondMoveCoordinate, symbolOfSecondMove);
+            m_PlayerTwo.AiBrain.SetCardRevealedFromLastMove(firstMoveCoordinate, symbolOfFirstMove, secondMoveCoordinate, symbolOfSecondMove);
         }
 
-        private Coordinate choseMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
+        private Coordinate askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
         {
             Coordinate moveCoordinate;
             bool v_AlreadyExposed;
@@ -252,20 +252,20 @@ namespace B20_Ex02
             do
             {
                 printMakeAMove(io_PlayingPlayer);
-                moveCoordinate = playingPlayerMakeAMove(io_Board, io_PlayingPlayer, i_MoveNum, i_SymbolOfFirstMoveCardRevealed);
-                v_AlreadyExposed = CheckInput.IssueErrorMessageExposedCube(haventBeenExposedYet(io_Board, moveCoordinate));
+                moveCoordinate = askPlayingPlayerForMoveAndMakeCoordinate(io_Board, io_PlayingPlayer, i_MoveNum, i_SymbolOfFirstMoveCardRevealed);
+                v_AlreadyExposed = CheckInput.IssueErrorMessageExposedCube(CheckIfCoordinateisExposed(io_Board, moveCoordinate));
             }
             while (v_AlreadyExposed == true);
 
             return moveCoordinate;
         }
 
-        private bool haventBeenExposedYet(GameBoard io_Board, Coordinate i_CurrMoveCoordinate)
+        private bool CheckIfCoordinateisExposed(GameBoard io_Board, Coordinate io_CurrMoveCoordinate)
         {
-            return io_Board.AlreadyExposed(i_CurrMoveCoordinate);
+            return io_Board.CheckIfAlreadyExposed(io_CurrMoveCoordinate);
         }
 
-        private Coordinate playingPlayerMakeAMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
+        private Coordinate askPlayingPlayerForMoveAndMakeCoordinate(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum io_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
         {
             Coordinate moveCoordinate;
 
@@ -279,7 +279,7 @@ namespace B20_Ex02
                 {
                     printComputerMakingAMove();
 
-                    if (i_MoveNum == eMoveNum.FirstMove)
+                    if (io_MoveNum == eMoveNum.FirstMove)
                     {
                         moveCoordinate = m_PlayerTwo.AiBrain.MakingFirstMove();
                     }
@@ -317,7 +317,7 @@ namespace B20_Ex02
             return new Coordinate(moveInputFromPlayer);
         }
 
-        private int makeAndRepresentTheBoardWithMove(GameBoard io_Board, Coordinate io_MoveCoordinate)
+        private int representTheBoardWithMove(GameBoard io_Board, Coordinate io_MoveCoordinate)
         {
             int symbolMove = io_Board.ExposeSymbolAndTakeValue(io_MoveCoordinate);
 
@@ -327,7 +327,7 @@ namespace B20_Ex02
             return symbolMove;
         }
 
-        private void cancelLastMove(GameBoard io_Board, Coordinate i_FirstMoveCoordinate, Coordinate i_SecondMoveCoordinate)
+        private void cancelLastPlayingPlayerPlay(GameBoard io_Board, Coordinate i_FirstMoveCoordinate, Coordinate i_SecondMoveCoordinate)
         {
             io_Board.HideIcon(i_FirstMoveCoordinate);
             io_Board.HideIcon(i_SecondMoveCoordinate);
@@ -470,9 +470,9 @@ namespace B20_Ex02
             System.Threading.Thread.Sleep(400);
         }
 
-        private void exitIfQ(string i_Move)
+        private void exitIfQ(string io_Move)
         {
-            if (i_Move == "Q")
+            if (io_Move == "Q")
             {
                 Environment.Exit(1);
             }
@@ -541,9 +541,9 @@ namespace B20_Ex02
             System.Console.Write(Environment.NewLine);
         }
 
-        private void printChoosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
+        private void printChoosingOfCompetitionForPlayerOne(string i_NameOfPlayerOne)
         {
-            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI) And 0 If You Want To Play Against Another Player", io_NameOfPlayerOne);
+            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI) And 0 If You Want To Play Against Another Player", i_NameOfPlayerOne);
 
             System.Console.WriteLine(msg);
         }
