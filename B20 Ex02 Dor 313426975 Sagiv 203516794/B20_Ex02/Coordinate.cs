@@ -1,6 +1,6 @@
 ﻿namespace B20_Ex02
 {
-    public readonly struct Coordinate
+    public struct Coordinate
     {
         private readonly int r_Row;
         private readonly int r_Col;
@@ -20,6 +20,7 @@
         {
             get { return r_Col; }
         }
+
         internal static Coordinate FromPresentationBoardCoordinateToGameBoardCoordinate(int io_CurrRowCoordinateOfPresentationBoard, int io_CurrColCoordinateOfPresentationBoard)
         {
             return new Coordinate(io_CurrRowCoordinateOfPresentationBoard, io_CurrColCoordinateOfPresentationBoard);

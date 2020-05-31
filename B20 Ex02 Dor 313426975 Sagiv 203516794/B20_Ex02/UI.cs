@@ -213,13 +213,15 @@ namespace B20_Ex02
         private void playerMakeMoveHisTurn(GameBoard io_Board, eTurn i_PlayingPlayer)
         {
             eMoveNum moveNum = eMoveNum.FirstMove;
-            Coordinate firstMoveCoordinate = askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(io_Board, i_PlayingPlayer, moveNum, null);
+            Coordinate firstMoveCoordinate =
+                askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(io_Board, i_PlayingPlayer, moveNum, null);
             int symbolOfFirstMove;
 
             symbolOfFirstMove = representTheBoardWithMove(io_Board, firstMoveCoordinate);
 
             moveNum = eMoveNum.SecondMove;
             Coordinate secondMoveCoordinate = askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(io_Board, i_PlayingPlayer, moveNum, symbolOfFirstMove);
+
             int symbolOfSecondMove;
 
             symbolOfSecondMove = representTheBoardWithMove(io_Board, secondMoveCoordinate);
@@ -241,7 +243,10 @@ namespace B20_Ex02
                 }
             }
 
-            m_PlayerTwo.AiBrain.SetCardRevealedFromLastMove(firstMoveCoordinate, symbolOfFirstMove, secondMoveCoordinate, symbolOfSecondMove);
+            if (m_PlayerTwo.IsAi() == true)
+            {
+                m_PlayerTwo.AiBrain.SetCardRevealedFromLastMove(firstMoveCoordinate, symbolOfFirstMove, secondMoveCoordinate, symbolOfSecondMove);
+            }
         }
 
         private Coordinate askPlayingPlayerForMoveCheckMoveAndMakeCoordinate(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
@@ -543,7 +548,7 @@ namespace B20_Ex02
 
         private void printChoosingOfCompetitionForPlayerOne(string i_NameOfPlayerOne)
         {
-            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI) And 0 If You Want To Play Against Another Player", i_NameOfPlayerOne);
+            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI){1}press 0 If You Want To Play Against Another Player", i_NameOfPlayerOne, Environment.NewLine);
 
             System.Console.WriteLine(msg);
         }
