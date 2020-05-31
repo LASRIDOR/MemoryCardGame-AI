@@ -483,6 +483,8 @@ namespace B20_Ex02
             }
         }
 
+        // this program chose randomaly symbol from ASCII table between '~' - '!' For the symbol for each card
+        // and makes list of symbol for UI
         private void makeRandSymbolListOfIconAccordingToSizeOfBoard(int i_NumOfRows, int i_NumOfCols)
         {
             List<char> listOfAllPossibleIcon;

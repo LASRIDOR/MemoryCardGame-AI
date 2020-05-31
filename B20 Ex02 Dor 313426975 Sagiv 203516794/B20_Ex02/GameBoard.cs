@@ -44,6 +44,7 @@ namespace B20_Ex02
                 set { IsHidden = value; }
             }
 
+            // hide icon if havent exposed yet with 0 int (in ui logical 0 represent space)
             public int SymbolOfIcon
             {
                 get
@@ -113,6 +114,7 @@ namespace B20_Ex02
             return m_Board[i_CurrMoveCoordinate.Row, i_CurrMoveCoordinate.Col].IsHidden == false;
         }
 
+        // make a mix of int according to the size of the board and divide them randomaly between the cubes
         private void boardPreparartion()
         {
             int numOfIcons = r_NumOfCols * r_NumOfRows;

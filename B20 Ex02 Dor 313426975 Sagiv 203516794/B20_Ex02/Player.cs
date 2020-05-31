@@ -52,6 +52,9 @@ namespace B20_Ex02
 
         public class Ai
         {
+            // Ai Explanation:
+            // my Ai is based on game theory and has specific strategy for each move
+            // XMove - says that i will play with x UnKnown Card in this move and (2-X) moves with known card
             private enum ePlayingStrategy
             {
                 ZeroMove = 0,
@@ -125,6 +128,10 @@ namespace B20_Ex02
                 return secondMove;
             }
 
+            // make a lottery between cards on knowing demand example: if i_NeedKnownCard == true then i want a known card
+            // and make i randomaly chose them from the dictionary of knowing card
+            // and always make sure that they havent exposed yet
+            // (No need for checking because ui will ask me again in case of exposing card but just to make sure)
             private Coordinate getCardForCurrMoveOnKnowingDemand(bool i_NeedKnownCard)
             {
                 Coordinate move;
@@ -151,6 +158,9 @@ namespace B20_Ex02
                 return move;
             }
 
+            // get last play from ui and in case of match play add And Remove If Exist from Sure win list And Dictionary
+            // in case of match from dictionary of knowing card (differend cards of coordinate) this program will add them to sure win list
+            // if this is a new reveal of card i will add this to dictionary of knowing card and calculate next move (Math of game theory)
             public void SetCardRevealedFromLastMove(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
             {
                 if (i_FirstMoveSymbol == i_SecondMoveSymbol)
@@ -205,6 +215,7 @@ namespace B20_Ex02
                 m_MyNextKindMove = ePlayingStrategy.ThreeMove;
             }
 
+            // Math of game theory for next move for matching game
             private void calculateNextMove()
             {
                 if (m_ListCoordinateForSureWinsMove.Count > 0)
