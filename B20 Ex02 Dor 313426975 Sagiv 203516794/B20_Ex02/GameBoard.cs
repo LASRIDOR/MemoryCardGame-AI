@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace B20_Ex02
 {
@@ -30,12 +29,12 @@ namespace B20_Ex02
 
         private struct Cube
         {
-            private readonly int m_SymbolOfIcon;
+            private readonly int r_SymbolOfIcon;
             private bool v_IsHidden;
 
             public Cube(int i_Icon, bool i_IsHidden)
             {
-                m_SymbolOfIcon = i_Icon;
+                r_SymbolOfIcon = i_Icon;
                 v_IsHidden = i_IsHidden;
             }
 
@@ -57,7 +56,7 @@ namespace B20_Ex02
                     }
                     else
                     {
-                        result = m_SymbolOfIcon;
+                        result = r_SymbolOfIcon;
                     }
 
                     return result;
@@ -82,9 +81,9 @@ namespace B20_Ex02
             return m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].SymbolOfIcon;
         }
 
-        public int GetIconInCoordinate(int i_rowNum, int i_colNum)
+        public int GetIconInCoordinate(Coordinate i_MoveCoordinate)
         {
-            return m_Board[i_rowNum, i_colNum].SymbolOfIcon;
+            return m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].SymbolOfIcon;
         }
 
         public void HideIcon(Coordinate i_MoveCoordinate)
@@ -92,7 +91,7 @@ namespace B20_Ex02
             m_Board[i_MoveCoordinate.Row, i_MoveCoordinate.Col].HideCube();
         }
 
-        public bool gameHasFinished()
+        public bool GameHasFinished()
         {
             bool v_GameOver = true;
 
@@ -109,7 +108,7 @@ namespace B20_Ex02
             return v_GameOver;
         }
 
-        public bool alreadyExposed(Coordinate i_CurrMoveCoordinate)
+        public bool AlreadyExposed(Coordinate i_CurrMoveCoordinate)
         {
             return m_Board[i_CurrMoveCoordinate.Row, i_CurrMoveCoordinate.Col].IsHidden == false;
         }

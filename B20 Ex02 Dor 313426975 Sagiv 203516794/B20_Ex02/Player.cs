@@ -1,43 +1,36 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace B20_Ex02
 {
     public class Player
     {
-        private readonly string m_NameOfPlayer;
+        private readonly string r_NameOfPlayer;
         private int m_Score;
-        private Ai m_AiBrain;
+        private readonly Ai m_AiBrain;
 
-        public Player.Ai AiBrain
+        public Ai AiBrain
         {
-            get
-            {
-                return m_AiBrain;
-            }
+            get { return m_AiBrain;}
         }
 
         public Player(string i_NameOfPlayer, bool isAi)
         {
             if (isAi == true)
             {
-                m_NameOfPlayer = "RoboMatch";
+                r_NameOfPlayer = "RoboMatch";
                 m_AiBrain = new Ai();
             }
             else
             {
-                m_NameOfPlayer = i_NameOfPlayer;
+                r_NameOfPlayer = i_NameOfPlayer;
                 m_AiBrain = null;
             }
         }
 
         public string NameOfPlayer
         {
-            get { return m_NameOfPlayer; }
+            get { return r_NameOfPlayer; }
         }
 
         public int Score
@@ -45,7 +38,7 @@ namespace B20_Ex02
             get { return m_Score; }
         }
 
-        public bool isAi()
+        public bool IsAi()
         {
             if (m_AiBrain == null)
             {
@@ -61,10 +54,10 @@ namespace B20_Ex02
         {
             private enum ePlayingStrategy
             {
-                Zero_Move = 0,
-                One_Move = 1,
-                Two_Move = 2,
-                Three_Move = 3
+                ZeroMove = 0,
+                OneMove = 1,
+                TwoMove = 2,
+                ThreeMove = 3
             }
 
             private Dictionary<int, Coordinate> m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch;
@@ -75,15 +68,15 @@ namespace B20_Ex02
             private List<Coordinate> m_ListCoordinateForSureWinsMove;
             private List<Coordinate> m_ListCoordinateExposedCard;
 
-            public Coordinate MaikngFirstMove()
+            public Coordinate MakingFirstMove()
             {
                 Coordinate firstMove;
 
-                if (m_MyNextKindMove == ePlayingStrategy.Two_Move || m_MyNextKindMove == ePlayingStrategy.One_Move)
+                if (m_MyNextKindMove == ePlayingStrategy.TwoMove || m_MyNextKindMove == ePlayingStrategy.OneMove)
                 {
                     firstMove = getCardForMove(false);
                 }
-                else if (m_MyNextKindMove == ePlayingStrategy.Zero_Move)
+                else if (m_MyNextKindMove == ePlayingStrategy.ZeroMove)
                 {
                     firstMove = getCardForMove(true);
                 }
@@ -96,11 +89,11 @@ namespace B20_Ex02
                 return firstMove;
             }
 
-            public Coordinate MaikngSecondMove(int i_SymbolOfFirstMoveCardRevealed)
+            public Coordinate MakingSecondMove(int i_SymbolOfFirstMoveCardRevealed)
             {
                 Coordinate secondMove;
 
-                if (m_MyNextKindMove == ePlayingStrategy.Two_Move || m_MyNextKindMove == ePlayingStrategy.One_Move)
+                if (m_MyNextKindMove == ePlayingStrategy.TwoMove || m_MyNextKindMove == ePlayingStrategy.OneMove)
                 {
                     if (m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.ContainsKey(i_SymbolOfFirstMoveCardRevealed) == true)
                     {
@@ -109,7 +102,7 @@ namespace B20_Ex02
                     }
                     else
                     {
-                        if (m_MyNextKindMove == ePlayingStrategy.Two_Move)
+                        if (m_MyNextKindMove == ePlayingStrategy.TwoMove)
                         {
                             secondMove = getCardForMove(false);
                         }
@@ -119,7 +112,7 @@ namespace B20_Ex02
                         }
                     }
                 }
-                else if(m_MyNextKindMove == ePlayingStrategy.Zero_Move)
+                else if(m_MyNextKindMove == ePlayingStrategy.ZeroMove)
                 {
                     secondMove = getCardForMove(true);
                 }
@@ -143,7 +136,7 @@ namespace B20_Ex02
                     int randRowCoordinate = rand.Next(0, m_NumOfRows);
                     int randColCoordinate = rand.Next(0, m_NumOfCols);
 
-                    move = new Coordinate(UI.r_ColSymbol[randColCoordinate].ToString() + UI.r_RowSymbol[randRowCoordinate].ToString());
+                    move = new Coordinate(UI.sr_ColSymbol[randColCoordinate].ToString() + UI.sr_RowSymbol[randRowCoordinate].ToString());
 
                     if (m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.ContainsValue(move) == i_NeedKnownCard)
                     {
@@ -158,11 +151,11 @@ namespace B20_Ex02
                 return move;
             }
 
-            public void cardsRevealed(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
+            public void CardsRevealed(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
             {
                 if (i_FirstMoveSymbol == i_SecondMoveSymbol)
                 {
-                    addAndRemoveIfExistMatchCard(i_FirstMoveCoordinate, i_FirstMoveSymbol, i_SecondMoveCoordinate, i_SecondMoveSymbol);
+                    addAndRemoveIfExistMatchCard(i_FirstMoveCoordinate, i_SecondMoveCoordinate, i_FirstMoveSymbol);
                     calculateNextMove();
                 }
                 else
@@ -195,13 +188,13 @@ namespace B20_Ex02
                 }
             }
 
-            private void addAndRemoveIfExistMatchCard(Coordinate i_FirstMoveCoordinate, int i_FirstMoveSymbol, Coordinate i_SecondMoveCoordinate, int i_SecondMoveSymbol)
+            private void addAndRemoveIfExistMatchCard(Coordinate i_FirstMoveCoordinate, Coordinate i_SecondMoveCoordinate, int i_SymbolOfMoves)
             {
                 m_ListCoordinateExposedCard.Add(i_FirstMoveCoordinate);
                 m_ListCoordinateExposedCard.Add(i_SecondMoveCoordinate);
                 m_ListCoordinateForSureWinsMove.Remove(i_FirstMoveCoordinate);
                 m_ListCoordinateForSureWinsMove.Remove(i_SecondMoveCoordinate);
-                m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Remove(i_FirstMoveSymbol);
+                m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Remove(i_SymbolOfMoves);
             }
 
             private void addToSureWinListKnownCard(int i_MoveSymbol, Coordinate i_MoveCoordinate)
@@ -209,48 +202,48 @@ namespace B20_Ex02
                 m_ListCoordinateForSureWinsMove.Add(m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch[i_MoveSymbol]);
                 m_ListCoordinateForSureWinsMove.Add(i_MoveCoordinate);
                 m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Remove(i_MoveSymbol);
-                m_MyNextKindMove = ePlayingStrategy.Three_Move;
+                m_MyNextKindMove = ePlayingStrategy.ThreeMove;
             }
 
             private void calculateNextMove()
             {
                 if (m_ListCoordinateForSureWinsMove.Count > 0)
                 {
-                    m_MyNextKindMove = ePlayingStrategy.Three_Move;
+                    m_MyNextKindMove = ePlayingStrategy.ThreeMove;
                 }
                 else
                 {
                     if (m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count == 0 ||
                          (m_PairsOnTable + m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count) % 2 == 1)
                     {
-                        m_MyNextKindMove = ePlayingStrategy.Two_Move;
+                        m_MyNextKindMove = ePlayingStrategy.TwoMove;
                     }
                     else if (m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count >= 1 &&
                          (m_PairsOnTable + m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count) % 2 == 0)
                     {
-                        m_MyNextKindMove = ePlayingStrategy.One_Move;
+                        m_MyNextKindMove = ePlayingStrategy.OneMove;
                     }
                     else if (m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count >=
                              2 * (m_PairsOnTable + 1) / 3 &&
                              (m_PairsOnTable + m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count) % 2 == 1)
                     {
-                        m_MyNextKindMove = ePlayingStrategy.Zero_Move;
+                        m_MyNextKindMove = ePlayingStrategy.ZeroMove;
                     }
 
                     if (m_PairsOnTable == 6 && m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch.Count == 1)
                     {
-                        m_MyNextKindMove = ePlayingStrategy.One_Move;
+                        m_MyNextKindMove = ePlayingStrategy.OneMove;
                     }
                 }
             }
 
-            public void resetMermory(int i_NumOfRow, int i_NumOfCol)
+            public void ResetMermory(int i_NumOfRow, int i_NumOfCol)
             {
                 m_DictionaryMemoryOfUnrevealedKnownCardWithoutMatch = new Dictionary<int, Coordinate>(i_NumOfRow * i_NumOfCol);
                 m_ListCoordinateForSureWinsMove = new List<Coordinate>(i_NumOfRow * i_NumOfCol);
                 m_ListCoordinateExposedCard = new List<Coordinate>(i_NumOfRow * i_NumOfCol);
                 m_PairsOnTable = i_NumOfRow * i_NumOfCol;
-                m_MyNextKindMove = ePlayingStrategy.Two_Move;
+                m_MyNextKindMove = ePlayingStrategy.TwoMove;
                 m_NumOfRows = i_NumOfRow;
                 m_NumOfCols = i_NumOfCol;
             }
@@ -260,7 +253,7 @@ namespace B20_Ex02
         {
             if (m_AiBrain != null)
             {
-                AiBrain.resetMermory(i_NumOfRow.Value, i_NumOfCol.Value);
+                AiBrain.ResetMermory(i_NumOfRow.Value, i_NumOfCol.Value);
             }
 
             m_Score = 0;

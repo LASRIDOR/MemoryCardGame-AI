@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Configuration;
-using System.Text;
-
-namespace B20_Ex02
+﻿namespace B20_Ex02
 {
     internal class CheckInput
     {
-        internal static bool IsValidPlayerOneEnemyChoice(string io_Choice)
+        public static bool IsValidPlayerOneEnemyChoice(string io_Choice)
         {
             bool v_ValidEnemyCoice = io_Choice == "1" || io_Choice == "0";
 
@@ -19,13 +14,13 @@ namespace B20_Ex02
             return v_ValidEnemyCoice;
         }
 
-        internal static bool IsValidBoardSize(string io_BoardSize)
+        public static bool IsValidBoardSize(string io_BoardSize)
         {
-            string[] seperateBoardSize = new string[io_BoardSize.Length];
+            string[] separateBoardSize = new string[io_BoardSize.Length];
 
             for (int i = 0; i < io_BoardSize.Length; i++)
             {
-                seperateBoardSize[i] = io_BoardSize[i].ToString();
+                separateBoardSize[i] = io_BoardSize[i].ToString();
             }
 
             int rowOfBoard;
@@ -44,14 +39,12 @@ namespace B20_Ex02
 
             if (v_IsSizeThree == true)
             {
-                v_FirstNumValid = seperateBoardSize[0] == "4" || seperateBoardSize[0] == "5" ||
-                                       seperateBoardSize[0] == "6";
-                v_SeperatorXValid = seperateBoardSize[1] == "x";
-                v_TwoNumValid = seperateBoardSize[2] == "4" || seperateBoardSize[2] == "5" ||
-                                     seperateBoardSize[2] == "6";
+                v_FirstNumValid = separateBoardSize[0] == "4" || separateBoardSize[0] == "5" || separateBoardSize[0] == "6";
+                v_SeperatorXValid = separateBoardSize[1] == "x";
+                v_TwoNumValid = separateBoardSize[2] == "4" || separateBoardSize[2] == "5" || separateBoardSize[2] == "6";
                 v_IsInOfRange = v_FirstNumValid == true && v_TwoNumValid == true;
-                v_FirstCharIsNumbers = int.TryParse(seperateBoardSize[0], out rowOfBoard);
-                v_LasriCharIsNumbers = int.TryParse(seperateBoardSize[2], out colOfBoard);
+                v_FirstCharIsNumbers = int.TryParse(separateBoardSize[0], out rowOfBoard);
+                v_LasriCharIsNumbers = int.TryParse(separateBoardSize[2], out colOfBoard);
                 v_IsEven = (rowOfBoard * colOfBoard) % 2 == 0;
                 v_isValidBoardSize = v_IsSizeThree && v_FirstNumValid && v_SeperatorXValid && v_TwoNumValid &&
                                           v_FirstCharIsNumbers && v_LasriCharIsNumbers && v_IsEven && v_IsInOfRange;
@@ -64,7 +57,7 @@ namespace B20_Ex02
 
                     if (v_SeperatorXValid == false)
                     {
-                        System.Console.WriteLine("Your seperator Between The Numbers Is not Valid");
+                        System.Console.WriteLine("Your separator Between The Numbers Is not Valid");
                     }
 
                     if (v_IsEven == false)
@@ -82,7 +75,7 @@ namespace B20_Ex02
             return v_isValidBoardSize;
         }
 
-        internal static bool IsValidMove(string i_Move, int i_NumOfRows, int i_NumOfCols)
+        public static bool IsValidMove(string i_Move, int i_NumOfRows, int i_NumOfCols)
         {
             bool v_IsSize = i_Move.Length == 2;
             bool v_FirstLetterIsvalid = false;
@@ -91,13 +84,13 @@ namespace B20_Ex02
 
             if (v_IsSize == true)
             {
-                v_FirstLetterIsvalid = UI.r_ColSymbol.Contains(i_Move[0]);
-                v_SecondLetterIsvalid = UI.r_RowSymbol.Contains(i_Move[1]);
+                v_FirstLetterIsvalid = UI.sr_ColSymbol.Contains(i_Move[0]);
+                v_SecondLetterIsvalid = UI.sr_RowSymbol.Contains(i_Move[1]);
 
                 if (v_SecondLetterIsvalid == true && v_FirstLetterIsvalid == true)
                 {
-                    v_InRange = ((i_Move[0] <= UI.r_ColSymbol[i_NumOfCols - 1]) && (i_Move[0] >= UI.r_ColSymbol[0])) &&
-                                ((i_Move[1] <= UI.r_RowSymbol[i_NumOfRows - 1]) && (i_Move[1] >= UI.r_RowSymbol[0]));
+                    v_InRange = ((i_Move[0] <= UI.sr_ColSymbol[i_NumOfCols - 1]) && (i_Move[0] >= UI.sr_ColSymbol[0])) &&
+                                ((i_Move[1] <= UI.sr_RowSymbol[i_NumOfRows - 1]) && (i_Move[1] >= UI.sr_RowSymbol[0]));
 
                     if (v_InRange == false)
                     {
@@ -106,7 +99,7 @@ namespace B20_Ex02
                 }
                 else
                 {
-                    System.Console.WriteLine("You Choice a Wrong Symbol of Row Or Col (in Capslk)");
+                    System.Console.WriteLine("You Choice a Wrong Symbol of Row Or Col (in Caps lock)");
                 }
             }
             else
@@ -117,7 +110,7 @@ namespace B20_Ex02
             return v_IsSize && v_FirstLetterIsvalid && v_SecondLetterIsvalid && v_InRange;
         }
 
-        internal static bool IssueErrorMessageExposedCube(bool io_AlreadyExposed)
+        public static bool IssueErrorMessageExposedCube(bool io_AlreadyExposed)
         {
             if (io_AlreadyExposed == true)
             {
@@ -132,7 +125,7 @@ namespace B20_Ex02
             System.Console.WriteLine("Your Choice Is Wrong Try Again (invalid input)");
         }
 
-        internal static bool CheckValidAnswerForAnotherGameQuestion(string i_PlayersAnswer)
+        public static bool CheckValidAnswerForAnotherGameQuestion(string i_PlayersAnswer)
         {
             bool v_validAnswer = i_PlayersAnswer == "Yes" || i_PlayersAnswer == "yes" || i_PlayersAnswer == "No" || i_PlayersAnswer == "no";
 

@@ -1,52 +1,33 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters;
-using System.Security.Policy;
-using System.Text;
 
 namespace B20_Ex02
 {
     public class UI
     {
         private static readonly int sr_PageWidth = 50;
-        private static readonly int sr_SpaceForSingleCubeCols = 4;
-        private static readonly int sr_SpaceForSingleCubeRows = 2;
+        internal static readonly int sr_SpaceForSingleCubeCols = 4;
+        internal static readonly int sr_SpaceForSingleCubeRows = 2;
         private static readonly int sr_SpacesBetweenCoordinatesAndBoardAndEdges = 3;
-        private static readonly int r_LogRows = 6;
-        private static readonly int r_LogCols = 6;
-        private static readonly int r_PhyRows = (r_LogRows * sr_SpaceForSingleCubeRows) + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
-        private static readonly int r_PhyCols = (r_LogCols * sr_SpaceForSingleCubeCols) + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
-        private static readonly char r_SignOfPlaceForGameIcon = 'S';
-        private static readonly char[,] m_PresentationBoard;
-        internal static readonly List<char> r_RowSymbol;
-        internal static readonly List<char> r_ColSymbol;
+        private static readonly int sr_LogRows = 6;
+        private static readonly int sr_LogCols = 6;
+        private static readonly int sr_PhyRows = (sr_LogRows * sr_SpaceForSingleCubeRows) + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
+        private static readonly int sr_PhyCols = (sr_LogCols * sr_SpaceForSingleCubeCols) + sr_SpacesBetweenCoordinatesAndBoardAndEdges;
+        private static readonly char sr_SignOfPlaceForGameIcon = 'S';
+        private static readonly char[,] sr_PresentationBoard;
+        internal static readonly List<char> sr_RowSymbol;
+        internal static readonly List<char> sr_ColSymbol;
         private Player m_PlayerOne;
         private Player m_PlayerTwo;
         private List<char> m_IconSymbol;
 
         static UI()
         {
-            m_PresentationBoard = new char[r_PhyRows, r_PhyCols];
-            r_RowSymbol = new List<char>(6);
-            r_ColSymbol = new List<char>(6);
+            sr_PresentationBoard = new char[sr_PhyRows, sr_PhyCols];
+            sr_RowSymbol = new List<char>(6);
+            sr_ColSymbol = new List<char>(6);
             makeRowColSymbol();
             makePresentationBoard();
-        }
-
-        private static void printSign(string i_Title)
-        {
-            string firstAndLastLineOfRectangle = new string('-', sr_PageWidth);
-            string spacesWithPlaceToEdgesOfRectangle = new string(' ', sr_PageWidth - 2);
-            string oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle = new string(' ', (sr_PageWidth - 1 - i_Title.Length) / 2);
-            string middleOfRectangle = string.Format("|{0}|", spacesWithPlaceToEdgesOfRectangle);
-            string middleOfRectangleTitleLine = string.Format("|{0}{1}{0}|", oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle, i_Title);
-            System.Console.WriteLine(firstAndLastLineOfRectangle);
-            System.Console.WriteLine(middleOfRectangle);
-            System.Console.WriteLine(middleOfRectangleTitleLine);
-            System.Console.WriteLine(middleOfRectangle);
-            System.Console.WriteLine(firstAndLastLineOfRectangle);
         }
 
         private static void makeRowColSymbol()
@@ -56,8 +37,8 @@ namespace B20_Ex02
 
             for (int i = 0; i < 6; i++)
             {
-                r_ColSymbol.Add(startOfAlphabet);
-                r_RowSymbol.Add(startOfNumbers);
+                sr_ColSymbol.Add(startOfAlphabet);
+                sr_RowSymbol.Add(startOfNumbers);
                 startOfAlphabet++;
                 startOfNumbers++;
             }
@@ -65,57 +46,44 @@ namespace B20_Ex02
 
         private static void makePresentationBoard()
         {
-            List<char>.Enumerator rowListEnumerator = (List<char>.Enumerator)r_RowSymbol.GetEnumerator();
-            List<char>.Enumerator colListEnumerator = (List<char>.Enumerator)r_ColSymbol.GetEnumerator();
+            List<char>.Enumerator rowListEnumerator = sr_RowSymbol.GetEnumerator();
+            List<char>.Enumerator colListEnumerator = sr_ColSymbol.GetEnumerator();
 
             rowListEnumerator.MoveNext();
             colListEnumerator.MoveNext();
 
-            for (int i = 0; i < r_PhyRows; i++)
+            for (int i = 0; i < sr_PhyRows; i++)
             {
-                for (int j = 0; j < r_PhyCols; j++)
+                for (int j = 0; j < sr_PhyCols; j++)
                 {
                     if (i == 0 && j % sr_SpaceForSingleCubeCols == 0 && j > 1)
                     {
-                        m_PresentationBoard[i, j] = colListEnumerator.Current;
+                        sr_PresentationBoard[i, j] = colListEnumerator.Current;
                         colListEnumerator.MoveNext();
                     }
                     else if (i % sr_SpaceForSingleCubeRows == 1 && i > 1 && j == 0)
                     {
-                        m_PresentationBoard[i, j] = rowListEnumerator.Current;
+                        sr_PresentationBoard[i, j] = rowListEnumerator.Current;
                         rowListEnumerator.MoveNext();
                     }
                     else if (i % sr_SpaceForSingleCubeRows == 0 && j > 1 && i > 0)
                     {
-                        m_PresentationBoard[i, j] = '=';
+                        sr_PresentationBoard[i, j] = '=';
                     }
                     else if (i % sr_SpaceForSingleCubeRows == 1 && i > 1 && j % sr_SpaceForSingleCubeCols == 2)
                     {
-                        m_PresentationBoard[i, j] = '|';
+                        sr_PresentationBoard[i, j] = '|';
                     }
                     else if (i % sr_SpaceForSingleCubeRows == 1 && j % sr_SpaceForSingleCubeCols == 0 && i > 1 && j > 1)
                     {
-                        m_PresentationBoard[i, j] = r_SignOfPlaceForGameIcon;
+                        sr_PresentationBoard[i, j] = sr_SignOfPlaceForGameIcon;
                     }
                     else
                     {
-                        m_PresentationBoard[i, j] = ' ';
+                        sr_PresentationBoard[i, j] = ' ';
                     }
                 }
             }
-        }
-
-        private static void printPlayerLogin()
-        {
-            System.Console.WriteLine("Please Enter Your Name: ");
-            System.Console.Write(Environment.NewLine);
-        }
-
-        private static void printChoosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
-        {
-            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI) And 0 If You Want To Play Against Another Player", io_NameOfPlayerOne);
-
-            System.Console.WriteLine(msg);
         }
 
         private enum eTurn
@@ -132,7 +100,7 @@ namespace B20_Ex02
 
         public void PlayMatchGame()
         {
-            UI.printSign("Welcome To Dor's World");
+            printSign("Welcome To Dori's World");
             m_PlayerOne = playerOneLogin();
             m_PlayerTwo = playerTwoLogin(m_PlayerOne.NameOfPlayer);
             bool v_WantToPlayAnotherGame;
@@ -158,7 +126,7 @@ namespace B20_Ex02
             string nameOfPlayerOne;
 
             printSign("Player One Login");
-            UI.printPlayerLogin();
+            printPlayerLogin();
             nameOfPlayerOne = System.Console.ReadLine();
             exitIfQ(nameOfPlayerOne);
             Ex02.ConsoleUtils.Screen.Clear();
@@ -169,31 +137,31 @@ namespace B20_Ex02
         private Player playerTwoLogin(string io_NameOfPlayerOne)
         {
             string nameOfPlayerTwo = null;
-            bool v_IsWantToPlayVsCompter;
+            bool v_WantToPlayVsCompter;
 
             printSign("Player Two Login");
-            v_IsWantToPlayVsCompter = ChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
+            v_WantToPlayVsCompter = choosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
 
-            if (v_IsWantToPlayVsCompter == false)
+            if (v_WantToPlayVsCompter == false)
             {
-                UI.printPlayerLogin();
+                printPlayerLogin();
                 nameOfPlayerTwo = System.Console.ReadLine();
                 exitIfQ(nameOfPlayerTwo);
             }
 
             Ex02.ConsoleUtils.Screen.Clear();
 
-            return new Player(nameOfPlayerTwo, v_IsWantToPlayVsCompter);
+            return new Player(nameOfPlayerTwo, v_WantToPlayVsCompter);
         }
 
-        private bool ChoosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
+        private bool choosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
         {
             string playerChoice;
             bool v_ValidInput;
 
             do
             {
-                UI.printChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
+                printChoosingOfCompetitionForPlayerOne(io_NameOfPlayerOne);
                 playerChoice = System.Console.ReadLine();
                 exitIfQ(playerChoice);
                 v_ValidInput = CheckInput.IsValidPlayerOneEnemyChoice(playerChoice);
@@ -235,7 +203,7 @@ namespace B20_Ex02
         {
             eTurn playerTurn = eTurn.PlayerOne;
 
-            while (io_Board.gameHasFinished() == false)
+            while (io_Board.GameHasFinished() == false)
             {
                 playerMakeMoveHisTurn(io_Board, playerTurn);
                 switchTurn(ref playerTurn);
@@ -251,15 +219,15 @@ namespace B20_Ex02
             symbolOfFirstMove = makeAndRepresentTheBoardWithMove(io_Board, firstMoveCoordinate);
 
             moveNum = eMoveNum.SecondMove;
-            Coordinate SecondMoveCoordinate = choseMove(io_Board, io_PlayingPlayer, moveNum, symbolOfFirstMove);
+            Coordinate secondMoveCoordinate = choseMove(io_Board, io_PlayingPlayer, moveNum, symbolOfFirstMove);
             int symbolOfSecondMove;
 
-            symbolOfSecondMove = makeAndRepresentTheBoardWithMove(io_Board, SecondMoveCoordinate);
+            symbolOfSecondMove = makeAndRepresentTheBoardWithMove(io_Board, secondMoveCoordinate);
 
             if (symbolOfSecondMove != symbolOfFirstMove)
             {
                 System.Threading.Thread.Sleep(2000);
-                cancelLastMove(io_Board, firstMoveCoordinate, SecondMoveCoordinate);
+                cancelLastMove(io_Board, firstMoveCoordinate, secondMoveCoordinate);
             }
             else
             {
@@ -273,7 +241,7 @@ namespace B20_Ex02
                 }
             }
 
-            m_PlayerTwo.AiBrain.cardsRevealed(firstMoveCoordinate, symbolOfFirstMove, SecondMoveCoordinate, symbolOfSecondMove);
+            m_PlayerTwo.AiBrain.CardsRevealed(firstMoveCoordinate, symbolOfFirstMove, secondMoveCoordinate, symbolOfSecondMove);
         }
 
         private Coordinate choseMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
@@ -285,16 +253,16 @@ namespace B20_Ex02
             {
                 printMakeAMove(io_PlayingPlayer);
                 moveCoordinate = playingPlayerMakeAMove(io_Board, io_PlayingPlayer, i_MoveNum, i_SymbolOfFirstMoveCardRevealed);
-                v_AlreadyExposed = CheckInput.IssueErrorMessageExposedCube(HaventBeenExposedYet(io_Board, moveCoordinate));
+                v_AlreadyExposed = CheckInput.IssueErrorMessageExposedCube(haventBeenExposedYet(io_Board, moveCoordinate));
             }
             while (v_AlreadyExposed == true);
 
             return moveCoordinate;
         }
 
-        private bool HaventBeenExposedYet(GameBoard io_Board, Coordinate i_CurrMoveCoordinate)
+        private bool haventBeenExposedYet(GameBoard io_Board, Coordinate i_CurrMoveCoordinate)
         {
-            return io_Board.alreadyExposed(i_CurrMoveCoordinate);
+            return io_Board.AlreadyExposed(i_CurrMoveCoordinate);
         }
 
         private Coordinate playingPlayerMakeAMove(GameBoard io_Board, eTurn io_PlayingPlayer, eMoveNum i_MoveNum, int? i_SymbolOfFirstMoveCardRevealed)
@@ -307,21 +275,21 @@ namespace B20_Ex02
             }
             else
             {
-                if (m_PlayerTwo.isAi() == true)
+                if (m_PlayerTwo.IsAi() == true)
                 {
                     printComputerMakingAMove();
 
                     if (i_MoveNum == eMoveNum.FirstMove)
                     {
-                        moveCoordinate = m_PlayerTwo.AiBrain.MaikngFirstMove();
+                        moveCoordinate = m_PlayerTwo.AiBrain.MakingFirstMove();
                     }
                     else
                     {
-                        moveCoordinate = m_PlayerTwo.AiBrain.MaikngSecondMove(i_SymbolOfFirstMoveCardRevealed.Value);
+                        moveCoordinate = m_PlayerTwo.AiBrain.MakingSecondMove(i_SymbolOfFirstMoveCardRevealed.Value);
                     }
 
-                    System.Console.Write(UI.r_ColSymbol[moveCoordinate.Col]);
-                    System.Console.WriteLine(UI.r_RowSymbol[moveCoordinate.Row]);
+                    System.Console.Write(UI.sr_ColSymbol[moveCoordinate.Col]);
+                    System.Console.WriteLine(UI.sr_RowSymbol[moveCoordinate.Row]);
                     System.Threading.Thread.Sleep(2000);
                 }
                 else
@@ -406,12 +374,12 @@ namespace B20_Ex02
 
         private bool askForAnotherGame()
         {
-            string AnotherGameQuestion = string.Format("{0} And {1}{2}Do You Want To Play Another Game (Yes Or No)", m_PlayerOne.NameOfPlayer, m_PlayerTwo.NameOfPlayer, Environment.NewLine);
+            string anotherGameQuestion = string.Format("{0} And {1}{2}Do You Want To Play Another Game (Yes Or No)", m_PlayerOne.NameOfPlayer, m_PlayerTwo.NameOfPlayer, Environment.NewLine);
             string playersAnswer;
             bool v_PlayerOneAndTwoIsDesicion;
             bool v_validAnswer;
 
-            System.Console.WriteLine(AnotherGameQuestion);
+            System.Console.WriteLine(anotherGameQuestion);
 
             do
             {
@@ -432,7 +400,9 @@ namespace B20_Ex02
 
         private void printChoseSizeOfBoardForPlayerOne()
         {
-            string msg = string.Format(@"{0} I need you to determine the size of the board{1}(Max size is 6 & Min size is 4 & make sure you enter an even number) Example of Input: 6x4", m_PlayerOne.NameOfPlayer, Environment.NewLine);
+            string msg =
+                string.Format(
+                    "{0} I need you to determine the size of the board{1}(Max size is 6 & Min size is 4 & make sure you enter an even number) Example of Input: 6x4", m_PlayerOne.NameOfPlayer, Environment.NewLine);
 
             System.Console.WriteLine(msg);
         }
@@ -446,13 +416,14 @@ namespace B20_Ex02
             {
                 for (int j = 0; j < numOfColsInCurrBoard; j++)
                 {
-                    if (m_PresentationBoard[i, j] == r_SignOfPlaceForGameIcon)
+                    if (sr_PresentationBoard[i, j] == sr_SignOfPlaceForGameIcon)
                     {
-                        printIconInCube(getIconInGameBoard(io_Board, i, j));
+                        Coordinate gameBoardCoordinate = Coordinate.FromPresentationBoardCoordinateToGameBoardCoordinate(i, j);
+                        printIconInCube(io_Board.GetIconInCoordinate(gameBoardCoordinate));
                     }
                     else
                     {
-                        System.Console.Write(m_PresentationBoard[i, j]);
+                        System.Console.Write(sr_PresentationBoard[i, j]);
                     }
                 }
 
@@ -481,11 +452,6 @@ namespace B20_Ex02
             string msg = string.Format("{0} Make a Move:{1}", playingPlayer, Environment.NewLine);
 
             System.Console.WriteLine(msg);
-        }
-
-        private int getIconInGameBoard(GameBoard io_Board, int io_CurrRowCoordinateOfPresentationBoard, int io_CurrColCoordinateOfPresentationBoard)
-        {
-            return io_Board.GetIconInCoordinate((io_CurrRowCoordinateOfPresentationBoard / sr_SpaceForSingleCubeRows) - 1, (io_CurrColCoordinateOfPresentationBoard / sr_SpaceForSingleCubeCols) - 1);
         }
 
         private void printComputerMakingAMove()
@@ -527,7 +493,7 @@ namespace B20_Ex02
 
             for (int i = 0; i < numOfIconNeeded; i++)
             {
-                // range in ascii table with only symbol (more the max board size)
+                // range in ASCII table with only symbol (more the max board size)
                 int randomNumber = random.Next(0, listOfAllPossibleIcon.Count);
                 m_IconSymbol.Add(listOfAllPossibleIcon[randomNumber]);
                 listOfAllPossibleIcon.RemoveAt(randomNumber);
@@ -536,7 +502,7 @@ namespace B20_Ex02
 
         private List<char> makeListOfAllPossibleCharacters(int i_NumOfCharMatchForIcon)
         {
-            // range in ascii table with only symbol (more the max board size)
+            // range in ASCII table with only symbol (more the max board size)
             List<char> allPossibleChar = new List<char>(i_NumOfCharMatchForIcon);
             char startOfPossibleCharForIcon = '!';
 
@@ -547,6 +513,39 @@ namespace B20_Ex02
             }
 
             return allPossibleChar;
+        }
+
+        private void printSign(string i_Title)
+        {
+            string firstAndLastLineOfRectangle = new string('-', sr_PageWidth);
+            string spacesWithPlaceToEdgesOfRectangle = new string(' ', sr_PageWidth - 2);
+
+            string oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle =
+                new string(' ', (sr_PageWidth - 1 - i_Title.Length) / 2);
+
+            string middleOfRectangle = string.Format("|{0}|", spacesWithPlaceToEdgesOfRectangle);
+
+            string middleOfRectangleTitleLine =
+                string.Format("|{0}{1}{0}|", oneSideOfSpacesWithPlaceToEdgesOfRectangleAndTitle, i_Title);
+
+            System.Console.WriteLine(firstAndLastLineOfRectangle);
+            System.Console.WriteLine(middleOfRectangle);
+            System.Console.WriteLine(middleOfRectangleTitleLine);
+            System.Console.WriteLine(middleOfRectangle);
+            System.Console.WriteLine(firstAndLastLineOfRectangle);
+        }
+
+        private void printPlayerLogin()
+        {
+            System.Console.WriteLine("Please Enter Your Name: ");
+            System.Console.Write(Environment.NewLine);
+        }
+
+        private void printChoosingOfCompetitionForPlayerOne(string io_NameOfPlayerOne)
+        {
+            string msg = string.Format("{0} Press 1 If You Want To Play Against The Computer(AI) And 0 If You Want To Play Against Another Player", io_NameOfPlayerOne);
+
+            System.Console.WriteLine(msg);
         }
     }
 }
