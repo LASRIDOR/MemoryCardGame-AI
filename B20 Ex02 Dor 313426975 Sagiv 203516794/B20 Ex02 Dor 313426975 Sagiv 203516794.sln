@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{423DAE57-8E1A-4B35-B651-9433ACECEB46}"
 	ProjectSection(SolutionItems) = preProject
-		B20 Ex02 Dor 313426975 Sagiv 203516794\Exersice Checking Report.txt = B20 Ex02 Dor 313426975 Sagiv 203516794\Exersice Checking Report.txt
+		B20_Ex02\Exersice Checking Report.txt = B20_Ex02\Exersice Checking Report.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B20_Ex02", "B20_Ex02\B20_Ex02.csproj", "{B883D029-A7AA-4EF3-A985-E7A66810EF59}"

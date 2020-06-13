@@ -131,7 +131,7 @@ namespace B20_Ex02
             mixingCardBeforeStart(ref listOfIcon);
         }
 
-        private void mixingCardBeforeStart(ref List<int> i_ListOfIcon)
+        private void mixingCardBeforeStart(ref List<int> io_ListOfIcon)
         {
             Random random = new Random();
 
@@ -140,9 +140,9 @@ namespace B20_Ex02
                 for (int j = 0; j < r_NumOfCols; j++)
                 {
                     // 0 saved to space symbol
-                    int randomNumber = random.Next(0, i_ListOfIcon.Count);
-                    m_Board[i, j] = new Cube(i_ListOfIcon[randomNumber], true);
-                    i_ListOfIcon.RemoveAt(randomNumber);
+                    int randomNumber = random.Next(0, io_ListOfIcon.Count);
+                    m_Board[i, j] = new Cube(io_ListOfIcon[randomNumber], true);
+                    io_ListOfIcon.RemoveAt(randomNumber);
                 }
             }
         }

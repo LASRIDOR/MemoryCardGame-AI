@@ -4,9 +4,9 @@
     {
         public static void Main()
         {
-            UI setGame = new UI();
+            SystemManager gameTime = new SystemManager();
 
-            setGame.PlayMatchGame();
+            gameTime.PlayMatchGame();
 
             // wait for enter
             System.Console.WriteLine("Please press 'Enter' to exit...");
