@@ -17,14 +17,13 @@ The program will first ask the user for the desired board size (number of column
 The initial state will be a symmetrically sized panel of X rows of columns at the request of the user.
 The program will not allow the selection of an odd number of squares (e.g. 5X5).
 At each stage the user will be asked to select a slot in the board to reveal the signal that is in the above box.
-At this point the user will be asked to select another box in which he thinks the additional letter T is located. The slot
-That you selected will be exposed in a similar way to where the first slot was exposed (the board will be drawn again)
+At this point the user will be asked to select another box in which he thinks the additional letter T is located.
+The slot you selected will be exposed in a similar way to the one in which the first slot was exposed (the board will be drawn again.)
 
 # the progress of the game
 1. The user is asked to enter his name (he is the first player).
 2. The user is asked to decide whether the game is for two players or against the computer.
-3. If he chooses the option of two players, he is asked to enter the name of the player
-The second.
+3. If he chooses the option of two players, he is asked to enter the name of the other player.
 4. The user is asked to determine the height and width of the board (minimum 4x4 maximum 6x6 and Double amount of squares required!).
 5. At the beginning of the rotation the matrix is empty and will be drawn in this way (in the case of 6x4).
 6 Each player in turn will be asked to choose the first slot he wants to reveal. If the selection is invalid a suitable message will be given and so on until it is selected a Valid slot (valid slot is a slot hidden within the board boundaries. Any other input is considered invalid And a notice must be issued explaining the reason for its illegality).
